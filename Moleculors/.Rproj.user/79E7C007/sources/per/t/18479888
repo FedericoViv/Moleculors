@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1568924919428.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1635015863",
+    "id" : "18479888",
+    "lastKnownWriteTime" : 1568925262,
+    "last_content_update" : 1568925262479,
+    "path" : "~/Desktop/R/Moleculors/R/Moleculors_V01.R",
+    "project_path" : "R/Moleculors_V01.R",
+    "properties" : {
+        "cursorPosition" : "3,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
