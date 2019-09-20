@@ -30,11 +30,33 @@ Moleculors$Molecular_input = function(){
 
   print(cartesian_csv)
 
-  return(cartesian_csv)
+  Moleculors$Input = cartesian_csv
+
+  return("Loading successful")
 
 }
 
-Moleculors$molecular_weight = function(mol_input){
-  if
+Moleculors$molecular_weight = function(){
+
+  if (is.data.frame(Moleculors$Input)) {
+
+    Weight_library = read.csv("tables/weight_table.csv")
+
+  } else {
+
+    return(message("No Input file detected"))
+  }
+
+  weight_vector = vector()
+
+  for (i in 1:nrow(Moleculors$Input)) {
+
+    weight_vector[i] = Weight_library$Weight[Weight_library$Symbol == as.character(Moleculors$Input$Atom[i])]
+
+  }
+
+  Moleculors$Weight = sum(weight_vector)
+
+  return("Weight .... Ok")
 
 }
