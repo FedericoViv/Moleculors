@@ -1,6 +1,17 @@
 ##Moleculors general
 
+# Moleculors envinronment. Every function of output will be part and only part
+# of this environment thus preventing global variables overlay.
+
 Moleculors = new.env()
+
+
+# This function take a csv file containing 4 colums:
+# atom symbol, X,Y,Z. Any difference will be detected as
+# an error or warning depending on the situation.
+#
+#
+#
 
 Moleculors$Molecular_input = function(){
 
@@ -32,9 +43,15 @@ Moleculors$Molecular_input = function(){
 
   Moleculors$Input = cartesian_csv
 
-  return("Loading successful")
+  return(message("Loading successful"))
 
 }
+
+# This function compute the molecular weight of the input molecule
+# by checking the atom symbol in the input matrix/df and crossing it
+# with an internal library containing atoms weight.
+#
+#
 
 Moleculors$molecular_weight = function(){
 
@@ -59,9 +76,15 @@ Moleculors$molecular_weight = function(){
 
   Moleculors$Weight = sum(weight_vector)
 
-  return("Weight... Ok")
+  return(message("Weight... Ok"))
 
 }
+
+# This function calculate the number of atoms of the
+# molecular input by simply calculating the number of rows of the input matrix
+#
+#
+#
 
 Moleculors$N_atoms = function(){
 
@@ -77,9 +100,21 @@ Moleculors$N_atoms = function(){
 
   }
 
-  return("N° of atoms... OK")
+  return(message("N° of atoms... OK"))
 
 }
+
+
+
+#this function take the cartesian coordinates of a molecule and return the graphical matrix
+#of its structure. To do this first of all remove all the hydrogens leaving only the carbons
+# and heteroatoms. Then it compute the relative distance for each atom from each other and
+# round it up. In the end we will have a matrix n*n where n is the number of atoms
+# and each cell contain an integer pointing to the number of bonds intercurring
+# between the diagonal element and the others.
+#
+#
+
 
 Moleculors$graphical_matrix = function(){
 
@@ -98,15 +133,43 @@ Moleculors$graphical_matrix = function(){
       }
     }
 
-    for (i in (nrow(Input_H_suppressed):1)) {
+    graph_matrix = matrix(nrow = nrow(Input_H_suppressed), ncol = nrow(Input_H_suppressed))
 
-      Input_H_suppressed$X[i] = Input_H_suppressed$X[i] - Input_H_suppressed$X[1]
-      Input_H_suppressed$Y[i] = Input_H_suppressed$Y[i] - Input_H_suppressed$Y[1]
-      Input_H_suppressed$Z[i] = Input_H_suppressed$Z[i] - Input_H_suppressed$Z[1]
-      print(Input_H_suppressed)
+    Input_H_suppressed_norm = Input_H_suppressed
+
+    for (i in 1:nrow(graph_matrix)) {
+      for (h in (nrow(Input_H_suppressed):1)) {
+
+        Input_H_suppressed_norm$X[h] = Input_H_suppressed$X[h] - Input_H_suppressed$X[i]
+        Input_H_suppressed_norm$Y[h] = Input_H_suppressed$Y[h] - Input_H_suppressed$Y[i]
+        Input_H_suppressed_norm$Z[h] = Input_H_suppressed$Z[h] - Input_H_suppressed$Z[i]
+      }
+
+      distance_vector = sqrt(apply(apply(Input_H_suppressed_norm[,-1], 1, `^`,2), 2, sum))
+
+      normalizer = min(distance_vector[-i])
+
+      for (t in 1:length(distance_vector)) {
+
+        distance_vector[t] = ceiling(distance_vector[t]/normalizer)
+
+      }
+
+      for (j in 1:ncol(graph_matrix)) {
+
+
+        graph_matrix[i,j] = abs(distance_vector[j] - distance_vector[i])
+
+        if (i != j & distance_vector[j] - distance_vector[i] == 0) {
+
+          graph_matrix[i,j] = distance_vector[i]
+        }
+
+      }
     }
 
-    distance_vector = sqrt(apply(apply(Input_H_suppressed[,-1], 1, `^`,2), 2, sum))
+    Moleculors$graph_matrix = graph_matrix
+
 
   } else {
 
@@ -115,5 +178,7 @@ Moleculors$graphical_matrix = function(){
     return("No graphical matrix was computated")
 
   }
+
+  return(message("Computing graphical Matrix... OK"))
 
 }
