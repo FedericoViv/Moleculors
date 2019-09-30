@@ -106,21 +106,26 @@ Moleculors$N_atoms = function(){
 
 
 
-#this function take the cartesian coordinates of a molecule and return the graphical matrix
-#of its structure. To do this first of all remove all the hydrogens leaving only the carbons
+# This function take the cartesian coordinates of a molecule and return the graphical matrices
+# of its structure. To do this first of all remove all the hydrogens leaving only the carbons
 # and heteroatoms. Then it compute the relative distance for each atom from each other and
 # round it up. In the end we will have a matrix n*n where n is the number of atoms
 # and each cell contain an integer pointing to the number of bonds intercurring
-# between the diagonal element and the others.
-#
-#
+# between the diagonal element and the others. The adjacency matrix is then computed by checking if
+# the distance is 1 or not.
+# For the edge matrix, the edge coordinate is computed from the input coordinates as the mid point
+# between two adjacent atoms and then the distance and adjacency is computed using the previuos
+# algorithm
 
 
 Moleculors$graphical_matrix = function(){
 
   if(is.data.frame(Moleculors$Input)){
+
     hydrogen_vector = c()
+
     for (i in 1:nrow(Moleculors$Input)) {
+
       if (as.character(Moleculors$Input$Atom[i] == "H")) {
 
         hydrogen_vector = append(hydrogen_vector, i)
@@ -133,52 +138,72 @@ Moleculors$graphical_matrix = function(){
       }
     }
 
-    graph_matrix = matrix(nrow = nrow(Input_H_suppressed), ncol = nrow(Input_H_suppressed))
-
-    Input_H_suppressed_norm = Input_H_suppressed
-
-    for (i in 1:nrow(graph_matrix)) {
-      for (h in (nrow(Input_H_suppressed):1)) {
-
-        Input_H_suppressed_norm$X[h] = Input_H_suppressed$X[h] - Input_H_suppressed$X[i]
-        Input_H_suppressed_norm$Y[h] = Input_H_suppressed$Y[h] - Input_H_suppressed$Y[i]
-        Input_H_suppressed_norm$Z[h] = Input_H_suppressed$Z[h] - Input_H_suppressed$Z[i]
-      }
-
-      distance_vector = sqrt(apply(apply(Input_H_suppressed_norm[,-1], 1, `^`,2), 2, sum))
-
-      normalizer = min(distance_vector[-i])
-
-      for (t in 1:length(distance_vector)) {
-
-        distance_vector[t] = ceiling(distance_vector[t]/normalizer)
-
-      }
-
-      for (j in 1:ncol(graph_matrix)) {
+    graph_Vdistance_matrix = matrix(nrow = nrow(Input_H_suppressed), ncol = nrow(Input_H_suppressed))
+    graph_Vadj_matrix = matrix(nrow = nrow(Input_H_suppressed), ncol = nrow(Input_H_suppressed))
 
 
-        graph_matrix[i,j] = abs(distance_vector[j] - distance_vector[i])
+    for (i in 1:nrow(graph_Vdistance_matrix)) {
 
-        if (i != j & distance_vector[j] - distance_vector[i] == 0) {
+      for (j in 1:ncol(graph_Vdistance_matrix)) {
 
-          graph_matrix[i,j] = distance_vector[i]
+        graph_Vdistance_matrix[i,j] = floor(sqrt((Input_H_suppressed$X[j] - Input_H_suppressed$X[i])^2 +
+                                                   (Input_H_suppressed$Y[j] - Input_H_suppressed$Y[i])^2 +
+                                                   (Input_H_suppressed$Z[j] - Input_H_suppressed$Z[i])^2))
+
+        if (i == j) {
+          graph_Vadj_matrix[i,j] = 0
+        } else if (graph_Vdistance_matrix[i,j] == 1){
+          graph_Vadj_matrix[i,j] = 1
+        } else {
+          graph_Vadj_matrix[i,j] = 0
         }
+      }
+    }
+    edge_matrix = matrix(nrow = (nrow(Input_H_suppressed) - 1), ncol = (ncol(Input_H_suppressed)-1))   ##MUST BE FIXED try using the adjacency matrix to check if two atoms are adjacent
+    for (i in 1:nrow(edge_matrix)) {
+      for (j in 1:ncol(edge_matrix)) {
+        simplified_input_H_suppressed = Input_H_suppressed[-i,(j+1)]
+        edge_matrix[i,j] = (Input_H_suppressed[i,(j+1)] +
+                              simplified_input_H_suppressed[which.min(abs(simplified_input_H_suppressed -
+                                                                        Input_H_suppressed[i,(j+1)]))])/2
+      }
 
+    }
+
+    graph_Edistance_matrix = matrix(nrow = nrow(edge_matrix), ncol = nrow(edge_matrix))
+    graph_Eadj_matrix = matrix(nrow = nrow(edge_matrix), ncol = nrow(edge_matrix))
+
+    for (i in 1:nrow(graph_Edistance_matrix)) {
+      for (j in 1:ncol(graph_Edistance_matrix)) {
+        graph_Edistance_matrix[i,j] = floor(sqrt((edge_matrix[j,1] - edge_matrix[i,1])^2 +
+                                                   (edge_matrix[j,2] - edge_matrix[j,2])^2 +
+                                                   (edge_matrix[j,3] - edge_matrix[j,3])^2))
+
+        if (i == j) {
+          graph_Eadj_matrix[i,j] = 0
+        } else if (graph_Vdistance_matrix[i,j] == 1){
+          graph_Eadj_matrix[i,j] = 1
+        } else {
+          graph_Eadj_matrix[i,j] = 0
+        }
       }
     }
 
-    Moleculors$graph_matrix = graph_matrix
+    Moleculors$graph_Vdistance_matrix = graph_Vdistance_matrix
+    Moleculors$graph_Vadj_matrix = graph_Vadj_matrix
+    Moleculors$graph_Edistance_matrix = graph_Edistance_matrix
+    Moleculors$graph_Eadj_matrix = graph_Eadj_matrix
 
 
   } else {
 
     message("No Input file detected")
 
-    return("No graphical matrix was computated")
+    return("No graphical matrix was computed")
 
   }
 
   return(message("Computing graphical Matrix... OK"))
 
 }
+
