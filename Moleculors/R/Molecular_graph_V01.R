@@ -115,9 +115,61 @@ Moleculors$graphical_matrix = function(){
 
 
 
-# This function calculate the Vdistance_matrix using as Input the Hydrogen suppressed
+# This function calculate the V matrices using as Input the Hydrogen suppressed
 # cartesian matrix
 
-Vdistance_matrix = function(Cart_Input_Hsupp){
+Vmatrices = function(Cart_Input_Hsupp){
+
+  graph_Vdistance_matrix = matrix(nrow = nrow(Input_H_suppressed), ncol = nrow(Input_H_suppressed))
+  graph_Vadj_matrix = matrix(nrow = nrow(Input_H_suppressed), ncol = nrow(Input_H_suppressed))
+  graph_VCdistance_matrix = matrix(nrow = nrow(Input_H_suppressed), ncol = nrow(Input_H_suppressed))
+
+  for (i in 1:nrow(graph_Vdistance_matrix)) {
+
+    for (j in 1:ncol(graph_Vdistance_matrix)) {
+
+      graph_Vdistance_matrix[i,j] = sqrt((Input_H_suppressed$X[j] - Input_H_suppressed$X[i])^2 +
+                                                 (Input_H_suppressed$Y[j] - Input_H_suppressed$Y[i])^2 +
+                                                 (Input_H_suppressed$Z[j] - Input_H_suppressed$Z[i])^2)
+
+
+      #graph_VCdistance_matrix[i,j] = nrow(Input_H_suppressed) - round(sqrt((Input_H_suppressed$X[j] - Input_H_suppressed$X[i])^2 +
+                                                                     #        (Input_H_suppressed$Y[j] - Input_H_suppressed$Y[i])^2 +
+                                                                      #       (Input_H_suppressed$Z[j] - Input_H_suppressed$Z[i])^2),0)
+
+
+    }
+  }
+
+  graph_Vdistance_matrix = apply(graph_Vdistance_matrix, 2, `/`, min(graph_Vdistance_matrix[1,-1]))
+
+
+
+
+  for (i in 1:nrow(graph_Vdistance_matrix)) {
+    for (j in 1:ncol(graph_Vdistance_matrix)) {
+      if (graph_Vdistance_matrix[i,j] =! 1 & graph_Vdistance_matrix[i,j] =! 0) {
+        graph_Vdistance_matrix[i,j] =
+      }
+    }
+  }
+
+
+  for (i in 1:nrow(graph_Vdistance_matrix)) {
+    for (j in 1:ncol(graph_Vdistance_matrix)) {
+      if (i == j) {
+        graph_Vadj_matrix[i,j] = 0
+        #graph_VCdistance_matrix[i,j] = 0
+      } else if (graph_Vdistance_matrix[i,j] == 1){
+        graph_Vadj_matrix[i,j] = 1
+      } else {
+        graph_Vadj_matrix[i,j] = 0
+      }
+    }
+  }
+
+  Moleculors$graph_Vdistance_matrix = graph_Vdistance_matrix
+  Moleculors$graph_Vadj_matrix = graph_Vadj_matrix
+  Moleculors$graph_VCdistance_matrix = graph_VCdistance_matrix
 
 }
