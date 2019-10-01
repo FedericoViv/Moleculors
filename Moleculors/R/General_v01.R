@@ -159,15 +159,21 @@ Moleculors$graphical_matrix = function(){
         }
       }
     }
-    edge_matrix = matrix(nrow = (nrow(Input_H_suppressed) - 1), ncol = (ncol(Input_H_suppressed)-1))   ##MUST BE FIXED try using the adjacency matrix to check if two atoms are adjacent
-    for (i in 1:nrow(edge_matrix)) {
-      for (j in 1:ncol(edge_matrix)) {
-        simplified_input_H_suppressed = Input_H_suppressed[-i,(j+1)]
-        edge_matrix[i,j] = (Input_H_suppressed[i,(j+1)] +
-                              simplified_input_H_suppressed[which.min(abs(simplified_input_H_suppressed -
-                                                                        Input_H_suppressed[i,(j+1)]))])/2
-      }
 
+    edge_matrix = matrix(nrow = (nrow(Input_H_suppressed) - 1), ncol = (ncol(Input_H_suppressed)-1))   ##MUST BE FIXED try using the adjacency matrix to check if two atoms are adjacent
+    h = 1
+    counter = 1
+
+    for (i in 1:nrow(graph_Vdistance_matrix)) {
+      for (j in h:nrow(graph_Vdistance_matrix)) {
+        if (graph_Vdistance_matrix[i,j] == 1) {
+          edge_matrix[counter, 1] = (Input_H_suppressed$X[i] + Input_H_suppressed$X[j])/2
+          edge_matrix[counter, 2] = (Input_H_suppressed$Y[i] + Input_H_suppressed$Y[j])/2
+          edge_matrix[counter, 3] = (Input_H_suppressed$Z[i] + Input_H_suppressed$Z[j])/2
+          counter = counter + 1
+        }
+      }
+    h = h + 1
     }
 
     graph_Edistance_matrix = matrix(nrow = nrow(edge_matrix), ncol = nrow(edge_matrix))
@@ -176,8 +182,8 @@ Moleculors$graphical_matrix = function(){
     for (i in 1:nrow(graph_Edistance_matrix)) {
       for (j in 1:ncol(graph_Edistance_matrix)) {
         graph_Edistance_matrix[i,j] = floor(sqrt((edge_matrix[j,1] - edge_matrix[i,1])^2 +
-                                                   (edge_matrix[j,2] - edge_matrix[j,2])^2 +
-                                                   (edge_matrix[j,3] - edge_matrix[j,3])^2))
+                                                   (edge_matrix[j,2] - edge_matrix[i,2])^2 +
+                                                   (edge_matrix[j,3] - edge_matrix[i,3])^2))
 
         if (i == j) {
           graph_Eadj_matrix[i,j] = 0
