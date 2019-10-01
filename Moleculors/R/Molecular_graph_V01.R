@@ -1,111 +1,3 @@
-##Moleculors general
-
-# Moleculors envinronment. Every function of output will be part and only part
-# of this environment thus preventing global variables overlay.
-
-Moleculors = new.env()
-
-
-# This function take a csv file containing 4 colums:
-# atom symbol, X,Y,Z. Any difference will be detected as
-# an error or warning depending on the situation.
-#
-#
-#
-
-Moleculors$Molecular_input = function(){
-
-  cartesian_csv = tryCatch({ cartesian_csv = read.csv(file.choose(),
-                                                      header = FALSE)
-                      },
-                    warning = function(w){
-                        warning(w)
-                        message("csv file doesn't look properly formatted")
-                    },
-
-                    error = function(e){
-                        message("Input file doesn't look like a csv file")
-                        return(NA)
-                    },
-
-                    finally = { message("Always use cartesian coordinates as input!")
-
-                    })
-
-  if (ncol(cartesian_csv) != 4) {
-
-    return(message("Input file has more/less column than expected"))
-
-  }
-  names(cartesian_csv) = c("Atom", "X", "Y", "Z")
-
-  print(cartesian_csv)
-
-  Moleculors$Input = cartesian_csv
-
-  return(message("Loading successful"))
-
-}
-
-# This function compute the molecular weight of the input molecule
-# by checking the atom symbol in the input matrix/df and crossing it
-# with an internal library containing atoms weight.
-#
-#
-
-Moleculors$molecular_weight = function(){
-
-  if (is.data.frame(Moleculors$Input)) {
-
-    Weight_library = read.csv("tables/weight_table.csv")
-
-  } else {
-
-    message("No Input file detected")
-
-    return(message("Weight... FAILED"))
-  }
-
-  weight_vector = vector()
-
-  for (i in 1:nrow(Moleculors$Input)) {
-
-    weight_vector[i] = Weight_library$Weight[Weight_library$Symbol == as.character(Moleculors$Input$Atom[i])]
-
-  }
-
-  Moleculors$Weight = sum(weight_vector)
-
-  return(message("Weight... Ok"))
-
-}
-
-# This function calculate the number of atoms of the
-# molecular input by simply calculating the number of rows of the input matrix
-#
-#
-#
-
-Moleculors$N_atoms = function(){
-
-  if(is.data.frame(Moleculors$Input)){
-
-    Moleculors$Natoms = nrow(Moleculors$Input)
-
-  } else {
-
-    message("No Input file detected")
-
-    return("N° of atoms... FAILED")
-
-  }
-
-  return(message("N° of atoms... OK"))
-
-}
-
-
-
 # This function take the cartesian coordinates of a molecule and return the graphical matrices
 # of its structure. To do this first of all remove all the hydrogens leaving only the carbons
 # and heteroatoms. Then it compute the relative distance for each atom from each other and
@@ -152,8 +44,8 @@ Moleculors$graphical_matrix = function(){
                                                    (Input_H_suppressed$Z[j] - Input_H_suppressed$Z[i])^2),0)
 
         graph_VCdistance_matrix[i,j] = nrow(Input_H_suppressed) - round(sqrt((Input_H_suppressed$X[j] - Input_H_suppressed$X[i])^2 +
-                                                   (Input_H_suppressed$Y[j] - Input_H_suppressed$Y[i])^2 +
-                                                   (Input_H_suppressed$Z[j] - Input_H_suppressed$Z[i])^2),0)
+                                                                               (Input_H_suppressed$Y[j] - Input_H_suppressed$Y[i])^2 +
+                                                                               (Input_H_suppressed$Z[j] - Input_H_suppressed$Z[i])^2),0)
 
         if (i == j) {
           graph_Vadj_matrix[i,j] = 0
@@ -180,7 +72,7 @@ Moleculors$graphical_matrix = function(){
           counter = counter + 1
         }
       }
-    h = h + 1
+      h = h + 1
     }
 
     graph_Edistance_matrix = matrix(nrow = nrow(edge_matrix), ncol = nrow(edge_matrix))
@@ -221,3 +113,11 @@ Moleculors$graphical_matrix = function(){
 
 }
 
+
+
+# This function calculate the Vdistance_matrix using as Input the Hydrogen suppressed
+# cartesian matrix
+
+Vdistance_matrix = function(Cart_Input_Hsupp){
+
+}
