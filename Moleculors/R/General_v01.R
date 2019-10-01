@@ -140,18 +140,24 @@ Moleculors$graphical_matrix = function(){
 
     graph_Vdistance_matrix = matrix(nrow = nrow(Input_H_suppressed), ncol = nrow(Input_H_suppressed))
     graph_Vadj_matrix = matrix(nrow = nrow(Input_H_suppressed), ncol = nrow(Input_H_suppressed))
+    graph_VCdistance_matrix = matrix(nrow = nrow(Input_H_suppressed), ncol = nrow(Input_H_suppressed))
 
 
     for (i in 1:nrow(graph_Vdistance_matrix)) {
 
       for (j in 1:ncol(graph_Vdistance_matrix)) {
 
-        graph_Vdistance_matrix[i,j] = floor(sqrt((Input_H_suppressed$X[j] - Input_H_suppressed$X[i])^2 +
+        graph_Vdistance_matrix[i,j] = round(sqrt((Input_H_suppressed$X[j] - Input_H_suppressed$X[i])^2 +
                                                    (Input_H_suppressed$Y[j] - Input_H_suppressed$Y[i])^2 +
-                                                   (Input_H_suppressed$Z[j] - Input_H_suppressed$Z[i])^2))
+                                                   (Input_H_suppressed$Z[j] - Input_H_suppressed$Z[i])^2),0)
+
+        graph_VCdistance_matrix[i,j] = nrow(Input_H_suppressed) - round(sqrt((Input_H_suppressed$X[j] - Input_H_suppressed$X[i])^2 +
+                                                   (Input_H_suppressed$Y[j] - Input_H_suppressed$Y[i])^2 +
+                                                   (Input_H_suppressed$Z[j] - Input_H_suppressed$Z[i])^2),0)
 
         if (i == j) {
           graph_Vadj_matrix[i,j] = 0
+          graph_VCdistance_matrix[i,j] = 0
         } else if (graph_Vdistance_matrix[i,j] == 1){
           graph_Vadj_matrix[i,j] = 1
         } else {
@@ -160,7 +166,8 @@ Moleculors$graphical_matrix = function(){
       }
     }
 
-    edge_matrix = matrix(nrow = (nrow(Input_H_suppressed) - 1), ncol = (ncol(Input_H_suppressed)-1))   ##MUST BE FIXED try using the adjacency matrix to check if two atoms are adjacent
+    edge_matrix = matrix(nrow = nrow(Input_H_suppressed),
+                         ncol = (ncol(Input_H_suppressed)-1))
     h = 1
     counter = 1
 
@@ -197,6 +204,7 @@ Moleculors$graphical_matrix = function(){
 
     Moleculors$graph_Vdistance_matrix = graph_Vdistance_matrix
     Moleculors$graph_Vadj_matrix = graph_Vadj_matrix
+    Moleculors$graph_VCdistance_matrix = graph_VCdistance_matrix
     Moleculors$graph_Edistance_matrix = graph_Edistance_matrix
     Moleculors$graph_Eadj_matrix = graph_Eadj_matrix
 
