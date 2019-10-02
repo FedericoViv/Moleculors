@@ -118,7 +118,7 @@ Moleculors$graphical_matrix = function(){
 # This function calculate the V matrices using as Input the Hydrogen suppressed
 # cartesian matrix
 
-Vmatrices = function(Cart_Input_Hsupp){
+Moleculors$Vmatrices = function(Cart_Input_Hsupp){
 
   graph_Vdistance_matrix = matrix(nrow = nrow(Input_H_suppressed), ncol = nrow(Input_H_suppressed))
   graph_Vadj_matrix = matrix(nrow = nrow(Input_H_suppressed), ncol = nrow(Input_H_suppressed))
@@ -141,18 +141,25 @@ Vmatrices = function(Cart_Input_Hsupp){
     }
   }
 
-  graph_Vdistance_matrix = apply(graph_Vdistance_matrix, 2, `/`, min(graph_Vdistance_matrix[1,-1]))
-
-
-
-
+  normi = min(graph_Vdistance_matrix[1,-1])
   for (i in 1:nrow(graph_Vdistance_matrix)) {
     for (j in 1:ncol(graph_Vdistance_matrix)) {
-      if (graph_Vdistance_matrix[i,j] =! 1 & graph_Vdistance_matrix[i,j] =! 0) {
-        graph_Vdistance_matrix[i,j] =
+      if (j == which.min(abs(graph_Vdistance_matrix[i,] - normi)) & j != i) {
+        graph_Vdistance_matrix[i,j] = 1
       }
     }
   }
+
+  for (i in 1:nrow(graph_Vdistance_matrix)) {
+    for (j in 1:ncol(graph_Vdistance_matrix)) {
+      if ((ceiling(graph_Vdistance_matrix[i,j]) - graph_Vdistance_matrix[i,j]) <= 0.55) {
+        graph_Vdistance_matrix[i,j] = ceiling(graph_Vdistance_matrix[i,j])
+      } else {
+        graph_Vdistance_matrix[i,j] = floor(graph_Vdistance_matrix[i,j])
+      }
+    }
+  }
+
 
 
   for (i in 1:nrow(graph_Vdistance_matrix)) {
