@@ -133,40 +133,20 @@ Moleculors$Vmatrices = function(Cart_Input_Hsupp){
                                                  (Input_H_suppressed$Z[j] - Input_H_suppressed$Z[i])^2)
 
 
-      #graph_VCdistance_matrix[i,j] = nrow(Input_H_suppressed) - round(sqrt((Input_H_suppressed$X[j] - Input_H_suppressed$X[i])^2 +
-                                                                     #        (Input_H_suppressed$Y[j] - Input_H_suppressed$Y[i])^2 +
-                                                                      #       (Input_H_suppressed$Z[j] - Input_H_suppressed$Z[i])^2),0)
+
 
 
     }
   }
 
-  normi = min(graph_Vdistance_matrix[1,-1])
-  for (i in 1:nrow(graph_Vdistance_matrix)) {
-    for (j in 1:ncol(graph_Vdistance_matrix)) {
-      if (j == which.min(abs(graph_Vdistance_matrix[i,] - normi)) & j != i) {
-        graph_Vdistance_matrix[i,j] = 1
-      }
-    }
-  }
-
-  for (i in 1:nrow(graph_Vdistance_matrix)) {
-    for (j in 1:ncol(graph_Vdistance_matrix)) {
-      if ((ceiling(graph_Vdistance_matrix[i,j]) - graph_Vdistance_matrix[i,j]) <= 0.55) {
-        graph_Vdistance_matrix[i,j] = ceiling(graph_Vdistance_matrix[i,j])
-      } else {
-        graph_Vdistance_matrix[i,j] = floor(graph_Vdistance_matrix[i,j])
-      }
-    }
-  }
-
-
+  graph_Vdistance_matrix = ceiling(apply(apply(graph_Vdistance_matrix, 2, round, 2), 2, `/`, min(graph_Vdistance_matrix[1,-1])))
+  graph_VCdistance_matrix = abs(apply(graph_Vdistance_matrix, 2, `-`, nrow(graph_Vdistance_matrix)))
 
   for (i in 1:nrow(graph_Vdistance_matrix)) {
     for (j in 1:ncol(graph_Vdistance_matrix)) {
       if (i == j) {
         graph_Vadj_matrix[i,j] = 0
-        #graph_VCdistance_matrix[i,j] = 0
+        graph_VCdistance_matrix[i,j] = 0
       } else if (graph_Vdistance_matrix[i,j] == 1){
         graph_Vadj_matrix[i,j] = 1
       } else {
