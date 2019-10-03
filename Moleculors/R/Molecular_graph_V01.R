@@ -31,9 +31,29 @@ Moleculors$graphical_matrix = function(){
     }
 
 
-    Moleculors$Vmatrices_copy(Input_H_suppressed)
+    Moleculors$Vmatrices(Input_H_suppressed)
 
     Moleculors$Ematrices(Input_H_suppressed, Moleculors$graph_Vadj_matrix)
+
+    Moleculors$V_Harary_matrix(Moleculors$graph_Vdistance_matrix)
+
+    Moleculors$E_Harary_matrix(Moleculors$graph_Edistance_matrix)
+
+    Moleculors$Rec_VCdistance(Moleculors$graph_VCdistance_matrix)
+
+    Moleculors$Rec_ECdistance(Moleculors$graph_ECdistance_matrix)
+
+    Moleculors$Complementary_Vdistance(Moleculors$graph_Vdistance_matrix)
+
+    Moleculors$Complementary_Edistance(Moleculors$graph_Edistance_matrix)
+
+    Moleculors$Rec_Complementary_Vdistance(Moleculors$graph_VCOMPdistance_matrix)
+
+    Moleculors$Rec_Complementary_Edistance(Moleculors$graph_ECOMPdistance_matrix)
+
+    Moleculors$Distance_path_Vdistance(Moleculors$graph_Vdistance_matrix)
+
+    Moleculors$Distance_path_Edistance(Moleculors$graph_Edistance_matrix)
 
 
   } else {
@@ -142,17 +162,45 @@ Moleculors$Ematrices = function(Cart_Input_Hsupp, Vadjmatrix){
   }
 
   graph_Edistance_matrix = matrix(nrow = nrow(edge_matrix), ncol = nrow(edge_matrix))
-  graph_Eadj_matrix = matrix(nrow = nrow(edge_matrix), ncol = nrow(edge_matrix))
+
+
+   for (i in 1:nrow(graph_Edistance_matrix)) {
+     for (j in 1:ncol(graph_Edistance_matrix)) {
+       graph_Edistance_matrix[i,j] = sqrt((edge_matrix[j,1] - edge_matrix[i,1])^2 +
+                                                  (edge_matrix[j,2] - edge_matrix[i,2])^2 +
+                                                  (edge_matrix[j,3] - edge_matrix[i,3])^2)
+     }
+   }
+
+  NA_vector = c()
+
+    for (j in 1:ncol(graph_Edistance_matrix)) {
+      if (is.na(graph_Edistance_matrix[1,j]) & !(j %in% NA_vector)) {
+        NA_vector = append(NA_vector, j)
+      }
+    }
+
+  graph_Edistance_matrix = graph_Edistance_matrix[-NA_vector, -NA_vector]
+  graph_Eadj_matrix = matrix(nrow = nrow(graph_Edistance_matrix), ncol = nrow(graph_Edistance_matrix))
+  graph_ECdistance_matrix = matrix(nrow = nrow(graph_Edistance_matrix), ncol = nrow(graph_Edistance_matrix))
+
+  for (i in 1:nrow(graph_Edistance_matrix)) {
+    for (j in 1:nrow(graph_Edistance_matrix)) {
+      if ((graph_Edistance_matrix[i,j] - min(graph_Edistance_matrix[1,-1])) <= 0.2 & i != j) {
+        graph_Edistance_matrix[i,j] = min(graph_Edistance_matrix[1,-1])
+      }
+    }
+  }
+
+  graph_Edistance_matrix = ceiling(apply(graph_Edistance_matrix, 2, `/`, min(graph_Edistance_matrix[1,-1])))
+  graph_ECdistance_matrix = abs(apply(graph_Edistance_matrix, 2, `-`, nrow(graph_Edistance_matrix)))
 
   for (i in 1:nrow(graph_Edistance_matrix)) {
     for (j in 1:ncol(graph_Edistance_matrix)) {
-      graph_Edistance_matrix[i,j] = floor(sqrt((edge_matrix[j,1] - edge_matrix[i,1])^2 +
-                                                 (edge_matrix[j,2] - edge_matrix[i,2])^2 +
-                                                 (edge_matrix[j,3] - edge_matrix[i,3])^2))
-
       if (i == j) {
         graph_Eadj_matrix[i,j] = 0
-      } else if (Vadjmatrix[i,j] == 1){
+        graph_ECdistance_matrix[i,j] = 0
+      } else if (graph_Edistance_matrix[i,j] == 1){
         graph_Eadj_matrix[i,j] = 1
       } else {
         graph_Eadj_matrix[i,j] = 0
@@ -162,6 +210,302 @@ Moleculors$Ematrices = function(Cart_Input_Hsupp, Vadjmatrix){
 
   Moleculors$graph_Edistance_matrix = graph_Edistance_matrix
   Moleculors$graph_Eadj_matrix = graph_Eadj_matrix
+  Moleculors$graph_ECdistance_matrix = graph_ECdistance_matrix
+}
+
+# This function compute the vertex version of the so called
+# Harary matrix. It take has input the Vdistance_matrix and for each
+# element of the matrix if i != j it returns the reciprocal value of
+# the distance matrix
+#
+
+Moleculors$V_Harary_matrix = function(Vdistance_matrix){
+
+  graph_VHarary_matrix = matrix(nrow = nrow(Vdistance_matrix), ncol = nrow(Vdistance_matrix))
+  for (i in 1:nrow(Vdistance_matrix)) {
+    for (j in 1:nrow(Vdistance_matrix)) {
+      if (i != j) {
+        graph_VHarary_matrix[i,j] = 1 /Vdistance_matrix[i,j]
+      } else {
+        graph_VHarary_matrix[i,j] = 0
+      }
+    }
+  }
+
+  Moleculors$graph_VHarary_matrix = graph_VHarary_matrix
+
+}
+
+# This function compute the edge version of the so called
+# Harary matrix. It take has input the Edistance_matrix and for each
+# element of the matrix if i != j it returns the reciprocal value of
+# the distance matrix
+#
+
+Moleculors$E_Harary_matrix = function(Edistance_matrix){
+
+  graph_EHarary_matrix = matrix(nrow = nrow(Edistance_matrix), ncol = nrow(Edistance_matrix))
+  for (i in 1:nrow(Edistance_matrix)) {
+    for (j in 1:nrow(Edistance_matrix)) {
+      if (i != j) {
+        graph_EHarary_matrix[i,j] = 1 /Edistance_matrix[i,j]
+      } else {
+        graph_EHarary_matrix[i,j] = 0
+      }
+    }
+  }
+
+  Moleculors$graph_EHarary_matrix = graph_EHarary_matrix
+
+}
+
+# This function compute the vertex version of the reciprocal
+# complement vertex matrix . It take has input the VCdistance_matrix and for each
+# element of the matrix if i != j it returns the reciprocal value of
+# the distance matrix
+#
+
+Moleculors$Rec_VCdistance = function(VCdistance_matrix){
+
+  graph_RecVCdistance_matrix = matrix(nrow = nrow(VCdistance_matrix), ncol = nrow(VCdistance_matrix))
+  for (i in 1:nrow(VCdistance_matrix)) {
+    for (j in 1:nrow(VCdistance_matrix)) {
+      if (i != j) {
+        graph_RecVCdistance_matrix[i,j] = 1 /VCdistance_matrix[i,j]
+      } else {
+        graph_RecVCdistance_matrix[i,j] = 0
+      }
+    }
+  }
+
+  Moleculors$graph_RecVCdistance_matrix = graph_RecVCdistance_matrix
 }
 
 
+
+
+# This function compute the edge version of the reciprocal
+# complement edge matrix . It take has input the ECdistance_matrix and for each
+# element of the matrix if i != j it returns the reciprocal value of
+# the edge distance matrix
+#
+
+Moleculors$Rec_ECdistance = function(ECdistance_matrix){
+
+  graph_RecECdistance_matrix = matrix(nrow = nrow(ECdistance_matrix), ncol = nrow(ECdistance_matrix))
+  for (i in 1:nrow(ECdistance_matrix)) {
+    for (j in 1:nrow(ECdistance_matrix)) {
+      if (i != j) {
+        graph_RecECdistance_matrix[i,j] = 1 /ECdistance_matrix[i,j]
+      } else {
+        graph_RecECdistance_matrix[i,j] = 0
+      }
+    }
+  }
+
+  Moleculors$graph_RecECdistance_matrix = graph_RecECdistance_matrix
+}
+
+
+# This function compute the vertex version of the complementary
+# vertex matrix . It take has input the Vdistance_matrix and for each
+# element of the matrix if i != j it returns the  value of dmin + dmax - elemij
+# were dmin is the minimal lenght in the molecular graph (1 for simple molecules)
+# dmax is the maximum lenght in the system and elemij is the value of the element i j
+# of the vertex distance matrix
+#
+
+
+Moleculors$Complementary_Vdistance = function(Vdistance_matrix){
+
+  graph_VCOMPdistance_matrix = matrix(nrow = nrow(Vdistance_matrix), ncol = nrow(Vdistance_matrix))
+  for (i in 1:nrow(Vdistance_matrix)) {
+    for (j in 1:nrow(Vdistance_matrix)) {
+      if (i != j) {
+        graph_VCOMPdistance_matrix[i,j] = 1 + max(Vdistance_matrix) - Vdistance_matrix[i,j]
+      } else {
+        graph_VCOMPdistance_matrix[i,j] = 0
+      }
+    }
+  }
+
+  Moleculors$graph_VCOMPdistance_matrix = graph_VCOMPdistance_matrix
+}
+
+
+# This function compute the edge version of the complementary
+# edge matrix . It take has input the Edistance_matrix and for each
+# element of the matrix if i != j it returns the  value of dmin + dmax - elemij
+# were dmin is the minimal lenght in the molecular graph (1 for simple molecules)
+# dmax is the maximum lenght in the system and elemij is the value of the element i j
+# of the edge distance matrix
+#
+
+
+Moleculors$Complementary_Edistance = function(Edistance_matrix){
+
+  graph_ECOMPdistance_matrix = matrix(nrow = nrow(Edistance_matrix), ncol = nrow(Edistance_matrix))
+  for (i in 1:nrow(Edistance_matrix)) {
+    for (j in 1:nrow(Edistance_matrix)) {
+      if (i != j) {
+        graph_ECOMPdistance_matrix[i,j] = 1 + max(Edistance_matrix) - Edistance_matrix[i,j]
+      } else {
+        graph_ECOMPdistance_matrix[i,j] = 0
+      }
+    }
+  }
+
+  Moleculors$graph_ECOMPdistance_matrix = graph_ECOMPdistance_matrix
+}
+
+# This function compute the vertex version of the reciprocal
+# complementary vertex matrix . It take has input the Complementary_Vdistance_matrix and for each
+# element of the matrix if i != j it returns the reciprocal value of
+# the distance matrix
+#
+
+Moleculors$Rec_Complementary_Vdistance = function(Complentary_Vdistance_matrix){
+
+  graph_VRecCOMPdistance_matrix = matrix(nrow = nrow(Complentary_Vdistance_matrix), ncol = nrow(Complentary_Vdistance_matrix))
+  for (i in 1:nrow(Complentary_Vdistance_matrix)) {
+    for (j in 1:nrow(Complentary_Vdistance_matrix)) {
+      if (i != j) {
+        graph_VRecCOMPdistance_matrix[i,j] = 1 /Complentary_Vdistance_matrix[i,j]
+      } else {
+        graph_VRecCOMPdistance_matrix[i,j] = 0
+      }
+    }
+  }
+
+  Moleculors$graph_VRecCOMPdistance_matrix = graph_VRecCOMPdistance_matrix
+}
+
+# This function compute the edge version of the reciprocal
+# complementary edge matrix . It take has input the Complementary_Edistance_matrix and for each
+# element of the matrix if i != j it returns the reciprocal value of
+# the distance matrix
+#
+
+Moleculors$Rec_Complementary_Edistance = function(Complentary_Edistance_matrix){
+
+  graph_ERecCOMPdistance_matrix = matrix(nrow = nrow(Complentary_Edistance_matrix), ncol = nrow(Complentary_Edistance_matrix))
+  for (i in 1:nrow(Complentary_Edistance_matrix)) {
+    for (j in 1:nrow(Complentary_Edistance_matrix)) {
+      if (i != j) {
+        graph_ERecCOMPdistance_matrix[i,j] = 1 /Complentary_Edistance_matrix[i,j]
+      } else {
+        graph_ERecCOMPdistance_matrix[i,j] = 0
+      }
+    }
+  }
+
+  Moleculors$graph_ERecCOMPdistance_matrix = graph_ERecCOMPdistance_matrix
+}
+
+# This function compute the vertex version of the distance-path-matrix
+# It take has input the Vdistance_matrix and for each
+# element of the matrix if i != j it returns elemij*(elemij + 1)/2 value of
+# the distance matrix
+#
+
+Moleculors$Distance_path_Vdistance = function(Vdistance_matrix){
+
+  graph_Vpathdistance_matrix = matrix(nrow = nrow(Vdistance_matrix), ncol = nrow(Vdistance_matrix))
+  for (i in 1:nrow(Vdistance_matrix)) {
+    for (j in 1:nrow(Vdistance_matrix)) {
+      if (i != j) {
+        graph_Vpathdistance_matrix[i,j] = Vdistance_matrix[i,j]*((Vdistance_matrix[i,j] + 1)/2)
+      } else {
+        graph_Vpathdistance_matrix[i,j] = 0
+      }
+    }
+  }
+
+  Moleculors$graph_Vpathdistance_matrix = graph_Vpathdistance_matrix
+}
+
+# This function compute the edge version of the distance-path-matrix
+# It take has input the Edistance_matrix and for each
+# element of the matrix if i != j it returns elemij*(elemij + 1)/2 value of
+# the distance matrix
+#
+
+Moleculors$Distance_path_Edistance = function(Edistance_matrix){
+
+  graph_Epathdistance_matrix = matrix(nrow = nrow(Edistance_matrix), ncol = nrow(Edistance_matrix))
+  for (i in 1:nrow(Edistance_matrix)) {
+    for (j in 1:nrow(Edistance_matrix)) {
+      if (i != j) {
+        graph_Epathdistance_matrix[i,j] = Edistance_matrix[i,j]*((Edistance_matrix[i,j] + 1)/2)
+      } else {
+        graph_Epathdistance_matrix[i,j] = 0
+      }
+    }
+  }
+
+  Moleculors$graph_Epathdistance_matrix = graph_Epathdistance_matrix
+}
+
+########################################TO BE IMPLEMENTED ################################
+
+
+# This function return the detour vertex matrix, which contain the longest
+# distance between two vertexes.
+
+Moleculors$Detour_Vdistance = function(Vdistance_matrix){
+
+}
+
+# This function return the detour edges matrix, which contain the longest
+# distance between two edges.
+
+Moleculors$Detour_Edistance = function(Edistance_matrix){
+
+}
+
+# This function return the complement V matrix of the detour matrix as V - dij where V
+# is the number of vertexes
+
+Moleculors$Detour_VCdistance = function(Vdistance_matrix){
+
+}
+
+
+# This function return the complement E matrix of the detour matrix as E - dij where E
+# is the number of edges
+
+Moleculors$Detour_ECdistance = function(Edistance_matrix){
+
+}
+
+# This function return the reverse V matrix of the detour matrix as dmax - Vdetourij where dmax
+# is the longest detour distance (max(Vdetour)) for vertexes
+
+Moleculors$RevDetour_Vdistance = function(detour_Vdistance_matrix){
+
+}
+
+# This function return the reverse E matrix of the detour matrix as dmax - Edetourij where dmax
+# is the longest detour distance (max(Edetour)) for edges
+
+
+Moleculors$RevDetour_Edistance = function(detour_Edistance_matrix){
+
+}
+
+# This function contain information on both V detour and V distance matrices
+# It returns Vdetourij if i < j and Vdistance if if i > j (i = j = 0)
+
+
+Moleculors$Detour_Distance_Vdistance = function(Vdistance_matrix, detour_Vdistance_matrix){
+
+}
+
+
+# This function contain information on both E detour and E distance matrices
+# It returns Edetourij if i < j and Edistance if if i > j (i = j = 0)
+
+
+Moleculors$Detour_Distance_Edistance = function(Edistance_matrix, detour_Edistance_matrix){
+
+}
