@@ -446,6 +446,60 @@ Moleculors$Distance_path_Edistance = function(Edistance_matrix){
   Moleculors$graph_Epathdistance_matrix = graph_Epathdistance_matrix
 }
 
+
+# This function return the laplacian matrix for the vertex distance matrix
+# it take as input the Vdistance_matrix and for each element return
+# -1 if elemij = 1, sum(elemi, == 1) if i = j (which is the angle of the vertex)
+# and 0 for every other element
+
+
+
+Moleculors$Laplacian_Vdistance = function(Vdistance_matrix){
+
+  graph_Vlaplacian_matrix = matrix(nrow = nrow(Vdistance_matrix), ncol = nrow(Vdistance_matrix))
+  for (i in 1:nrow(Vdistance_matrix)) {
+    for (j in 1:nrow(Vdistance_matrix)) {
+      if (Vdistance_matrix[i,j] == 1) {
+        graph_Vlaplacian_matrix[i,j] = - 1
+      } else if (i == j){
+        graph_Vlaplacian_matrix[i,j] = sum(Vdistance_matrix[i,] == 1)
+      } else {
+        graph_Vlaplacian_matrix[i,j] = 0
+      }
+    }
+  }
+
+  Moleculors$graph_Vlaplacian_matrix = graph_Vlaplacian_matrix
+}
+
+
+# This function return the laplacian matrix for the edge distance matrix
+# it take as input the Edistance_matrix and for each element return
+# -1 if elemij = 1, sum(elemi, == 1) if i = j (which is the angle of the edge)
+# and 0 for every other element
+
+
+
+Moleculors$Laplacian_Edistance = function(Edistance_matrix){
+
+  graph_Elaplacian_matrix = matrix(nrow = nrow(Edistance_matrix), ncol = nrow(Edistance_matrix))
+  for (i in 1:nrow(Edistance_matrix)) {
+    for (j in 1:nrow(Edistance_matrix)) {
+      if (Edistance_matrix[i,j] == 1) {
+        graph_Elaplacian_matrix[i,j] = - 1
+      } else if (i == j){
+        graph_Elaplacian_matrix[i,j] = sum(Edistance_matrix[i,] == 1)
+      } else {
+        graph_Elaplacian_matrix[i,j] = 0
+      }
+    }
+  }
+
+  Moleculors$graph_Elaplacian_matrix = graph_Elaplacian_matrix
+}
+
+
+
 ########################################TO BE IMPLEMENTED ################################
 
 
