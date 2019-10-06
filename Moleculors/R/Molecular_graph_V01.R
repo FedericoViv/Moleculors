@@ -31,9 +31,17 @@ Moleculors$graphical_matrix = function(){
     }
 
 
-    Moleculors$Vmatrices(Input_H_suppressed)
+    Moleculors$Vadj_matrix(Input_H_suppressed)
 
-    Moleculors$Ematrices(Input_H_suppressed, Moleculors$graph_Vadj_matrix)
+    Moleculors$Vdistance_matrix(Moleculors$graph_Vadj_matrix)
+
+    Moleculors$VCdistance_matrix(Moleculors$graph_Vdistance_matrix)
+
+    Moleculors$Eadj_matrix(Input_H_suppressed, Moleculors$graph_Vadj_matrix)
+
+    Moleculors$Edistance_matrix(Moleculors$graph_Eadj_matrix)
+
+    Moleculors$ECdistance_matrix(Moleculors$graph_Edistance_matrix)
 
     Moleculors$V_Harary_matrix(Moleculors$graph_Vdistance_matrix)
 
@@ -55,6 +63,10 @@ Moleculors$graphical_matrix = function(){
 
     Moleculors$Distance_path_Edistance(Moleculors$graph_Edistance_matrix)
 
+    Moleculors$Laplacian_Vdistance(Moleculors$graph_Vdistance_matrix)
+
+    Moleculors$Laplacian_Edistance(Moleculors$graph_Edistance_matrix)
+
 
   } else {
 
@@ -70,80 +82,132 @@ Moleculors$graphical_matrix = function(){
 
 
 
-# This function calculate the V matrices using as Input the Hydrogen suppressed
+# This function calculate the V adjacency matrix using as Input the Hydrogen suppressed
 # cartesian matrix. In order to compute the distances it starts by calculating the
 # magnitude of the vector from each atom to one another. Then after rounding (too many digits
 # may lead to bad calculation in the following steps) it choose the smallest value (different
 # from 0) has the 1 distance value. A loop is used to assure that every value of lenght 1 has
 # the same value for the normalization step following later.
-# a normalization is the computed and the values are rounded to the upper interger (has the module
-# will be for sure lesser than the real distance). This algoright should be usable for small
-# molecule without many folding. It has been tested for small branched molecule and some cyclic one.
-# What needs to be tested: heteroatoms may change lenght distance, branched molecule with atoms > 20 - 30
+# a normalization is the computed and  every other value different from 1 is set to 0
+#
+#
+#
 
-Moleculors$Vmatrices = function(Cart_Input_Hsupp){
+Moleculors$Vadj_matrix = function(Cart_Input_Hsupp){
 
-  graph_Vdistance_matrix = matrix(nrow = nrow(Cart_Input_Hsupp), ncol = nrow(Cart_Input_Hsupp))
   graph_Vadj_matrix = matrix(nrow = nrow(Cart_Input_Hsupp), ncol = nrow(Cart_Input_Hsupp))
-  graph_VCdistance_matrix = matrix(nrow = nrow(Cart_Input_Hsupp), ncol = nrow(Cart_Input_Hsupp))
 
-  for (i in 1:nrow(graph_Vdistance_matrix)) {
+  for (i in 1:nrow(graph_Vadj_matrix)) {
 
-    for (j in 1:ncol(graph_Vdistance_matrix)) {
+    for (j in 1:ncol(graph_Vadj_matrix)) {
 
-      graph_Vdistance_matrix[i,j] = sqrt((Cart_Input_Hsupp$X[j] - Cart_Input_Hsupp$X[i])^2 +
-                                           (Cart_Input_Hsupp$Y[j] - Cart_Input_Hsupp$Y[i])^2 +
-                                           (Cart_Input_Hsupp$Z[j] - Cart_Input_Hsupp$Z[i])^2)
-
-
-
-
+      graph_Vadj_matrix[i,j] = sqrt((Cart_Input_Hsupp$X[j] - Cart_Input_Hsupp$X[i])^2 +
+                                      (Cart_Input_Hsupp$Y[j] - Cart_Input_Hsupp$Y[i])^2 +
+                                      (Cart_Input_Hsupp$Z[j] - Cart_Input_Hsupp$Z[i])^2)
 
     }
   }
 
-  graph_Vdistance_matrix = apply(graph_Vdistance_matrix, 2, round, 2)
+  graph_Vadj_matrix = apply(graph_Vadj_matrix, 2, round, 2)
 
-  for (i in 1:nrow(graph_Vdistance_matrix)) {
-    for (j in 1:nrow(graph_Vdistance_matrix)) {
-      if ((graph_Vdistance_matrix[i,j] - min(graph_Vdistance_matrix[1,-1])) <= 0.05 & i != j) {
-        graph_Vdistance_matrix[i,j] = min(graph_Vdistance_matrix[1,-1])
+
+  for (i in 1:nrow(graph_Vadj_matrix)) {
+    for (j in 1:nrow(graph_Vadj_matrix)) {
+      if ((graph_Vadj_matrix[i,j] - min(graph_Vadj_matrix[1,-1])) <= 0.1 & i != j) {
+        graph_Vadj_matrix[i,j] = min(graph_Vadj_matrix[1,-1])
       }
     }
   }
 
-  graph_Vdistance_matrix = ceiling(apply(graph_Vdistance_matrix, 2, `/`, min(graph_Vdistance_matrix[1,-1])))
-  graph_VCdistance_matrix = abs(apply(graph_Vdistance_matrix, 2, `-`, nrow(graph_Vdistance_matrix)))
+  graph_Vadj_matrix = apply(graph_Vadj_matrix, 2, `/`, min(graph_Vadj_matrix[1,-1]))
+
+  for (i in 1:nrow(graph_Vadj_matrix)) {
+    for (j in 1:nrow(graph_Vadj_matrix)) {
+      if (graph_Vadj_matrix[i,j] != 1) {
+        graph_Vadj_matrix[i,j] = 0
+      }
+    }
+  }
+
+  Moleculors$graph_Vadj_matrix = graph_Vadj_matrix
+}
+
+
+
+# This function take the adjacency matrix as input and generate a connection list where the index
+# is related to the atom and the value in the index list are the atoms to which that atom is connected
+# For each element with d != 1 is then calculated the distance by taking the value in the connection list
+# copying those into the connection vector and if the interested atom (j) is not in the connection vector
+# a new vector is created with all the connection of the atom to which the first atoms was connected
+# this is looped increasing distance at each failed loop to detect the interested element.
+
+Moleculors$Vdistance_matrix = function(Vadj_Input_matrix){
+
+  graph_Vdistance_matrix = matrix(nrow = nrow(Vadj_Input_matrix), ncol = nrow(Vadj_Input_matrix))
+
+  connections = list()
+  index_counter = c()
+
+  for (i in 1:nrow(Vadj_Input_matrix)) {
+    connections = append(connections, list(which(Vadj_Input_matrix[i,] == 1)))
+  }
+
 
   for (i in 1:nrow(graph_Vdistance_matrix)) {
-    for (j in 1:ncol(graph_Vdistance_matrix)) {
-      if (i == j) {
-        graph_Vadj_matrix[i,j] = 0
-        graph_VCdistance_matrix[i,j] = 0
-      } else if (graph_Vdistance_matrix[i,j] == 1){
-        graph_Vadj_matrix[i,j] = 1
-      } else {
-        graph_Vadj_matrix[i,j] = 0
+    for (j in 1:nrow(graph_Vdistance_matrix)) {
+      d = 1
+      if (Vadj_Input_matrix[i,j] == 1) {
+        graph_Vdistance_matrix[i,j] = 1
+      } else if (i == j) {
+        graph_Vdistance_matrix[i,j] = 0
+      } else if (i != j & Vadj_Input_matrix[i,j] == 0) {
+        connection_vector = connections[[i]]
+        while (!(j %in% connection_vector)) {
+          connections_holder = c()
+          for (k in 1:length(connection_vector)) {
+            connections_holder = append(connections_holder, connections[[connection_vector[k]]])
+          }
+          d = d + 1
+          connection_vector = connections_holder
+        }
+        graph_Vdistance_matrix[i,j] = d
       }
     }
   }
 
   Moleculors$graph_Vdistance_matrix = graph_Vdistance_matrix
-  Moleculors$graph_Vadj_matrix = graph_Vadj_matrix
-  Moleculors$graph_VCdistance_matrix = graph_VCdistance_matrix
-
 }
 
+# This function requires the Vdistance_matrix in order to compute the complement
+# of the distance matrix. Each element is set has nrow(Vdistance) - Vdistanceij
+#
+#
+
+Moleculors$VCdistance_matrix = function(Vdistance_matrix){
+
+  graph_VCdistance_matrix = matrix(nrow = nrow(Vdistance_matrix), ncol = nrow(Vdistance_matrix))
+
+  for (i in 1:nrow(graph_VCdistance_matrix)) {
+    for (j in 1:nrow(graph_VCdistance_matrix)) {
+      if (i != j) {
+        graph_VCdistance_matrix[i,j] = nrow(Vdistance_matrix) - Vdistance_matrix[i,j]
+      } else {
+        graph_VCdistance_matrix[i,j] = 0
+      }
+    }
+  }
+  Moleculors$graph_VCdistance_matrix = graph_VCdistance_matrix
+}
 
 
 # This function require the H suppressed cartesian matrix
 # and the adjagency matrix for the vertexes in order to compute
-# the edge cartesian matrix and the relation edges matrices.
-# each matrix will be save in the moleculors scope to be used for
-# future descriptor calculation.
+# the edge cartesian matrix and the adjacency edges matrices.
+#
+#
 
 
-Moleculors$Ematrices = function(Cart_Input_Hsupp, Vadjmatrix){
+Moleculors$Eadj_matrix = function(Cart_Input_Hsupp, Vadjmatrix){
   edge_matrix = matrix(nrow = nrow(Cart_Input_Hsupp),
                        ncol = (ncol(Cart_Input_Hsupp)-1))
   h = 1
@@ -161,57 +225,117 @@ Moleculors$Ematrices = function(Cart_Input_Hsupp, Vadjmatrix){
     h = h + 1
   }
 
-  graph_Edistance_matrix = matrix(nrow = nrow(edge_matrix), ncol = nrow(edge_matrix))
+  graph_Eadj_matrix = matrix(nrow = nrow(edge_matrix), ncol = nrow(edge_matrix))
 
 
-   for (i in 1:nrow(graph_Edistance_matrix)) {
-     for (j in 1:ncol(graph_Edistance_matrix)) {
-       graph_Edistance_matrix[i,j] = sqrt((edge_matrix[j,1] - edge_matrix[i,1])^2 +
-                                                  (edge_matrix[j,2] - edge_matrix[i,2])^2 +
-                                                  (edge_matrix[j,3] - edge_matrix[i,3])^2)
-     }
-   }
+  for (i in 1:nrow(graph_Eadj_matrix)) {
+    for (j in 1:ncol(graph_Eadj_matrix)) {
+      graph_Eadj_matrix[i,j] = sqrt((edge_matrix[j,1] - edge_matrix[i,1])^2 +
+                                      (edge_matrix[j,2] - edge_matrix[i,2])^2 +
+                                      (edge_matrix[j,3] - edge_matrix[i,3])^2)
+    }
+  }
 
   NA_vector = c()
 
-    for (j in 1:ncol(graph_Edistance_matrix)) {
-      if (is.na(graph_Edistance_matrix[1,j]) & !(j %in% NA_vector)) {
-        NA_vector = append(NA_vector, j)
-      }
+  for (j in 1:ncol(graph_Eadj_matrix)) {
+    if (is.na(graph_Eadj_matrix[1,j]) & !(j %in% NA_vector)) {
+      NA_vector = append(NA_vector, j)
     }
+  }
 
-  graph_Edistance_matrix = graph_Edistance_matrix[-NA_vector, -NA_vector]
-  graph_Eadj_matrix = matrix(nrow = nrow(graph_Edistance_matrix), ncol = nrow(graph_Edistance_matrix))
-  graph_ECdistance_matrix = matrix(nrow = nrow(graph_Edistance_matrix), ncol = nrow(graph_Edistance_matrix))
+  if (!(is.null(NA_vector))) {
+    graph_Eadj_matrix = graph_Eadj_matrix[-NA_vector, -NA_vector]
+  }
 
-  for (i in 1:nrow(graph_Edistance_matrix)) {
-    for (j in 1:nrow(graph_Edistance_matrix)) {
-      if ((graph_Edistance_matrix[i,j] - min(graph_Edistance_matrix[1,-1])) <= 0.2 & i != j) {
-        graph_Edistance_matrix[i,j] = min(graph_Edistance_matrix[1,-1])
+
+  graph_Eadj_matrix = apply(graph_Eadj_matrix, 2, round, 2)
+
+  for (i in 1:nrow(graph_Eadj_matrix)) {
+    for (j in 1:nrow(graph_Eadj_matrix)) {
+      if ((graph_Eadj_matrix[i,j] - min(graph_Eadj_matrix[1,-1])) <= 0.1 & i != j) {
+        graph_Eadj_matrix[i,j] = min(graph_Eadj_matrix[1,-1])
       }
     }
   }
 
-  graph_Edistance_matrix = ceiling(apply(graph_Edistance_matrix, 2, `/`, min(graph_Edistance_matrix[1,-1])))
-  graph_ECdistance_matrix = abs(apply(graph_Edistance_matrix, 2, `-`, nrow(graph_Edistance_matrix)))
+  graph_Eadj_matrix = apply(graph_Eadj_matrix, 2, `/`, min(graph_Eadj_matrix[1,-1]))
+
+  for (i in 1:nrow(graph_Eadj_matrix)) {
+    for (j in 1:nrow(graph_Eadj_matrix)) {
+      if (graph_Eadj_matrix[i,j] != 1) {
+        graph_Eadj_matrix[i,j] = 0
+      }
+    }
+  }
+
+  Moleculors$graph_Eadj_matrix = graph_Eadj_matrix
+}
+
+# This function takes as input the Eadjancency matrix and compute, using
+# the same algorithm used for the vertexes, the distance matrix for the edges.
+# This is done by computing a connection vector that states with which edge each edge is connected
+# than it loop through each connection to find the wanted connection (e.g. elemij It loop through
+# the connection of 1 until it find the element j, increasing the distance at each loop)
+
+Moleculors$Edistance_matrix = function(Eadj_Input_matrix){
+
+  graph_Edistance_matrix = matrix(nrow = nrow(Eadj_Input_matrix), ncol = nrow(Eadj_Input_matrix))
+
+  connections = list()
+  index_counter = c()
+
+  for (i in 1:nrow(Eadj_Input_matrix)) {
+    connections = append(connections, list(which(Eadj_Input_matrix[i,] == 1)))
+  }
+
 
   for (i in 1:nrow(graph_Edistance_matrix)) {
-    for (j in 1:ncol(graph_Edistance_matrix)) {
-      if (i == j) {
-        graph_Eadj_matrix[i,j] = 0
-        graph_ECdistance_matrix[i,j] = 0
-      } else if (graph_Edistance_matrix[i,j] == 1){
-        graph_Eadj_matrix[i,j] = 1
-      } else {
-        graph_Eadj_matrix[i,j] = 0
+    for (j in 1:nrow(graph_Edistance_matrix)) {
+      d = 1
+      if (Eadj_Input_matrix[i,j] == 1) {
+        graph_Edistance_matrix[i,j] = 1
+      } else if (i == j) {
+        graph_Edistance_matrix[i,j] = 0
+      } else if (i != j & Eadj_Input_matrix[i,j] == 0) {
+        connection_vector = connections[[i]]
+        while (!(j %in% connection_vector)) {
+          connections_holder = c()
+          for (k in 1:length(connection_vector)) {
+            connections_holder = append(connections_holder, connections[[connection_vector[k]]])
+          }
+          d = d + 1
+          connection_vector = connections_holder
+        }
+        graph_Edistance_matrix[i,j] = d
       }
     }
   }
 
   Moleculors$graph_Edistance_matrix = graph_Edistance_matrix
-  Moleculors$graph_Eadj_matrix = graph_Eadj_matrix
+}
+
+
+
+# This function takes as input the Edistance matrix and compute for each element
+# the complement as nrow(Edistance_matrix) - Edistance_matrix[i,j]
+
+Moleculors$ECdistance_matrix = function(Edistance_matrix){
+
+  graph_ECdistance_matrix = matrix(nrow = nrow(Edistance_matrix), ncol = nrow(Edistance_matrix))
+
+  for (i in 1:nrow(graph_ECdistance_matrix)) {
+    for (j in 1:nrow(graph_ECdistance_matrix)) {
+      if (i != j) {
+        graph_ECdistance_matrix[i,j] = nrow(Edistance_matrix) - Edistance_matrix[i,j]
+      } else {
+        graph_ECdistance_matrix[i,j] = 0
+      }
+    }
+  }
   Moleculors$graph_ECdistance_matrix = graph_ECdistance_matrix
 }
+
 
 # This function compute the vertex version of the so called
 # Harary matrix. It take has input the Vdistance_matrix and for each
