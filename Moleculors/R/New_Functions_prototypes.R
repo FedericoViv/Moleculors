@@ -1,12 +1,49 @@
 # This source contain prototypes of functions to be implemented.
 # Once implemented will be removed from this file
 
+# This function take as input the Vdistance matrix and an interger < then 
+# nrow(vdistance) and return the adjmatrix for the k(n) neighbour
+
+Moleculors$Vadj_kneigh_matrix = function(n, Vdistance_matrix) {
+
+	if (n < nrow(Vdistance_matrix) & is.integer(n)){
+		graph_Vadj_kneigh_matrix = matrix(nrow = nrow(Vdistance_matrix), ncol = nrow(Vdistance_matrix))
 
 
+		for (i in 1:nrow(Vdistance_matrix) {
+			for (j in seq1:nrow(Vdistance_matrix) {
+				if (i != j & Vdistance_matrix[,j] == n){
+					graph_Vadj_kneigh_matrix[i,j] = 1
+				} else {
+					graph_Vadj_kneigh_matrix[i,j] = 0
+				}
+			}
+		}
 
+		assign(paste('Moleculors$graph_Vadj_kneigh_matrix', n, sep=''), graph_Vadj_kneigh_matrix)
 
+	} else {
+		message("no adjacency K neighbour matrix was computed")
+	}
+}
+ 
+# This function takes as input the adjacency matrix and an integer n and
+# return the n power of the adjacency matrix.
 
+Moleculors$Vadj_highpower_matrix = function(n, Vadj_matrix){
 
+	if (is.integer(n)){
+
+		graph_Vadj_highpower_matrix = Vadj_matrix
+
+		for (i in 1:n) {
+
+			graph_Vadj_highpower_matrix = graph_Vadj_highpower_matrix %*% Vadj_matrix
+		}
+
+		assign(paste('Moleculors$graph_Vadj_highpower_matrix', n, sep=''), graph_Vadj_highpower_matrix)
+	}
+}
 
 
 # This function return the Szeged matrix for the vertex distance matrix
