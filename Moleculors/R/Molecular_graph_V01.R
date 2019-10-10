@@ -1,3 +1,13 @@
+## This source file contain all the necessary functions to compute several
+# graphical matrix necessary for the further computation of twoD descriptors (TOPOLOGICAL)
+# The main function graphical_matrix() Calls every grpahical function and warn the user
+# if any of the computation failed. Each matrix is then stored in the Moleculors environment
+# for future use.
+
+
+
+
+
 # This function take the cartesian coordinates of a molecule and return the graphical matrices
 # of its structure. To do this first of all remove all the hydrogens leaving only the carbons
 # and heteroatoms. Then it compute the relative distance for each atom from each other and
@@ -66,6 +76,11 @@ Moleculors$graphical_matrix = function(){
     Moleculors$Laplacian_Vdistance(Moleculors$graph_Vdistance_matrix)
 
     Moleculors$Laplacian_Edistance(Moleculors$graph_Edistance_matrix)
+
+    Moleculors$Vadj_kneigh_matrix(2, Moleculors$graph_Vdistance_matrix)
+
+    Moleculors$Vadj_highpower_matrix(2, Moleculors$graph_Vadj_matrix)
+
 
 
   } else {
@@ -622,6 +637,57 @@ Moleculors$Laplacian_Edistance = function(Edistance_matrix){
   Moleculors$graph_Elaplacian_matrix = graph_Elaplacian_matrix
 }
 
+# This function take as input the Vdistance matrix and an interger < then
+# nrow(vdistance) and return the adjmatrix for the k(n) neighbour
+
+Moleculors$Vadj_kneigh_matrix = function(n, Vdistance_matrix) {
+
+  if (n < nrow(Vdistance_matrix) & n%%1 == 0){
+    graph_Vadj_kneigh_matrix = matrix(nrow = nrow(Vdistance_matrix), ncol = nrow(Vdistance_matrix))
+
+
+    for (i in 1:nrow(Vdistance_matrix)) {
+      for (j in 1:nrow(Vdistance_matrix)) {
+        if (i != j & Vdistance_matrix[i,j] == n){
+          graph_Vadj_kneigh_matrix[i,j] = 1
+        } else {
+          graph_Vadj_kneigh_matrix[i,j] = 0
+        }
+      }
+    }
+
+    Moleculors$graph_Vadj_kneigh_matrix = graph_Vadj_kneigh_matrix
+
+    message(paste('Vadj_kneigh_matrix computed for n = ', n, sep = ''))
+
+  } else {
+    message("no adjacency K neighbour matrix was computed")
+  }
+}
+
+
+# This function takes as input the adjacency matrix and an integer n and
+# return the n power of the adjacency matrix.
+
+Moleculors$Vadj_highpower_matrix = function(n, Vadj_Input_matrix){
+
+  if (n%%1 == 0){
+
+    graph_Vadj_highpower_matrix = Vadj_Input_matrix
+
+    for (i in 2:n) {
+
+      graph_Vadj_highpower_matrix = graph_Vadj_highpower_matrix %*% Vadj_Input_matrix
+    }
+
+    Moleculors$graph_vadj_highpower_matrix = graph_Vadj_highpower_matrix
+
+    message(paste('Vadj_highpower_matrix computed for n = ', n, sep =''))
+
+  } else {
+    message("no adj highpower matrix was computed")
+  }
+}
 
 
 ########################################TO BE IMPLEMENTED ################################
