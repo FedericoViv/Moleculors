@@ -22,64 +22,64 @@
 
 Moleculors$graphical_matrix = function(){
 
-  if(is.data.frame(Moleculors$Input)){
+  if(is.data.frame(Mol_mat$input)){
 
     hydrogen_vector = c()
 
-    for (i in 1:nrow(Moleculors$Input)) {
+    for (i in 1:nrow(Mol_mat$input)) {
 
-      if (as.character(Moleculors$Input$Atom[i] == "H")) {
+      if (as.character(Mol_mat$input$Atom[i] == "H")) {
 
         hydrogen_vector = append(hydrogen_vector, i)
 
       }
-      if (i == nrow(Moleculors$Input)) {
+      if (i == nrow(Mol_mat$input)) {
 
-        Input_H_suppressed = Moleculors$Input[-hydrogen_vector,]
+        input_H_suppressed = Mol_mat$input[-hydrogen_vector,]
 
       }
     }
 
 
-    Moleculors$Vadj_matrix(Input_H_suppressed)
+    Moleculors$Vadj_matrix(input_H_suppressed)
 
-    Moleculors$Vdistance_matrix(Moleculors$graph_Vadj_matrix)
+    Moleculors$Vdistance_matrix()
 
-    Moleculors$VCdistance_matrix(Moleculors$graph_Vdistance_matrix)
+    Moleculors$VCdistance_matrix()
 
-    Moleculors$Eadj_matrix(Input_H_suppressed, Moleculors$graph_Vadj_matrix)
+    Moleculors$Eadj_matrix(input_H_suppressed)
 
-    Moleculors$Edistance_matrix(Moleculors$graph_Eadj_matrix)
+    Moleculors$Edistance_matrix()
 
-    Moleculors$ECdistance_matrix(Moleculors$graph_Edistance_matrix)
+    Moleculors$ECdistance_matrix()
 
-    Moleculors$V_Harary_matrix(Moleculors$graph_Vdistance_matrix)
+    Moleculors$V_Harary_matrix()
 
-    Moleculors$E_Harary_matrix(Moleculors$graph_Edistance_matrix)
+    Moleculors$E_Harary_matrix()
 
-    Moleculors$Rec_VCdistance(Moleculors$graph_VCdistance_matrix)
+    Moleculors$Rec_VCdistance()
 
-    Moleculors$Rec_ECdistance(Moleculors$graph_ECdistance_matrix)
+    Moleculors$Rec_ECdistance()
 
-    Moleculors$Complementary_Vdistance(Moleculors$graph_Vdistance_matrix)
+    Moleculors$Complementary_Vdistance()
 
-    Moleculors$Complementary_Edistance(Moleculors$graph_Edistance_matrix)
+    Moleculors$Complementary_Edistance()
 
-    Moleculors$Rec_Complementary_Vdistance(Moleculors$graph_VCOMPdistance_matrix)
+    Moleculors$Rec_Complementary_Vdistance()
 
-    Moleculors$Rec_Complementary_Edistance(Moleculors$graph_ECOMPdistance_matrix)
+    Moleculors$Rec_Complementary_Edistance()
 
-    Moleculors$Distance_path_Vdistance(Moleculors$graph_Vdistance_matrix)
+    Moleculors$Distance_path_Vdistance()
 
-    Moleculors$Distance_path_Edistance(Moleculors$graph_Edistance_matrix)
+    Moleculors$Distance_path_Edistance()
 
-    Moleculors$Laplacian_Vdistance(Moleculors$graph_Vdistance_matrix)
+    Moleculors$Laplacian_Vdistance()
 
-    Moleculors$Laplacian_Edistance(Moleculors$graph_Edistance_matrix)
+    Moleculors$Laplacian_Edistance()
 
-    Moleculors$Vadj_kneigh_matrix(2, Moleculors$graph_Vdistance_matrix)
+    Moleculors$Vadj_kneigh_matrix(2)
 
-    Moleculors$Vadj_highpower_matrix(2, Moleculors$graph_Vadj_matrix)
+    Moleculors$Vadj_highpower_matrix(2)
 
 
 
@@ -144,7 +144,9 @@ Moleculors$Vadj_matrix = function(Cart_Input_Hsupp){
     }
   }
 
-  Moleculors$graph_Vadj_matrix = graph_Vadj_matrix
+  Mol_mat$graph_Vadj_matrix = graph_Vadj_matrix
+
+  message("Vertex adjacency matrix ... OK")
 }
 
 
@@ -156,41 +158,47 @@ Moleculors$Vadj_matrix = function(Cart_Input_Hsupp){
 # a new vector is created with all the connection of the atom to which the first atoms was connected
 # this is looped increasing distance at each failed loop to detect the interested element.
 
-Moleculors$Vdistance_matrix = function(Vadj_Input_matrix){
+Moleculors$Vdistance_matrix = function(){
 
-  graph_Vdistance_matrix = matrix(nrow = nrow(Vadj_Input_matrix), ncol = nrow(Vadj_Input_matrix))
+  if (is.matrix(Mol_mat$graph_Vadj_matrix)) {
+    graph_Vdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_Vadj_matrix), ncol = nrow(Mol_mat$graph_Vadj_matrix))
 
-  connections = list()
-  index_counter = c()
+    connections = list()
+    index_counter = c()
 
-  for (i in 1:nrow(Vadj_Input_matrix)) {
-    connections = append(connections, list(which(Vadj_Input_matrix[i,] == 1)))
-  }
+    for (i in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
+      connections = append(connections, list(which(Mol_mat$graph_Vadj_matrix[i,] == 1)))
+    }
 
 
-  for (i in 1:nrow(graph_Vdistance_matrix)) {
-    for (j in 1:nrow(graph_Vdistance_matrix)) {
-      d = 1
-      if (Vadj_Input_matrix[i,j] == 1) {
-        graph_Vdistance_matrix[i,j] = 1
-      } else if (i == j) {
-        graph_Vdistance_matrix[i,j] = 0
-      } else if (i != j & Vadj_Input_matrix[i,j] == 0) {
-        connection_vector = connections[[i]]
-        while (!(j %in% connection_vector)) {
-          connections_holder = c()
-          for (k in 1:length(connection_vector)) {
-            connections_holder = append(connections_holder, connections[[connection_vector[k]]])
+    for (i in 1:nrow(graph_Vdistance_matrix)) {
+      for (j in 1:nrow(graph_Vdistance_matrix)) {
+        d = 1
+        if (Mol_mat$graph_Vadj_matrix[i,j] == 1) {
+          graph_Vdistance_matrix[i,j] = 1
+        } else if (i == j) {
+          graph_Vdistance_matrix[i,j] = 0
+        } else if (i != j & Mol_mat$graph_Vadj_matrix[i,j] == 0) {
+          connection_vector = connections[[i]]
+          while (!(j %in% connection_vector)) {
+            connections_holder = c()
+            for (k in 1:length(connection_vector)) {
+              connections_holder = append(connections_holder, connections[[connection_vector[k]]])
+            }
+            d = d + 1
+            connection_vector = connections_holder
           }
-          d = d + 1
-          connection_vector = connections_holder
+          graph_Vdistance_matrix[i,j] = d
         }
-        graph_Vdistance_matrix[i,j] = d
       }
     }
-  }
 
-  Moleculors$graph_Vdistance_matrix = graph_Vdistance_matrix
+    Mol_mat$graph_Vdistance_matrix = graph_Vdistance_matrix
+
+    message("Vertex distance matrix ... OK")
+  } else {
+    message("Vertex distance matrix ... FAIL")
+  }
 }
 
 # This function requires the Vdistance_matrix in order to compute the complement
@@ -198,20 +206,26 @@ Moleculors$Vdistance_matrix = function(Vadj_Input_matrix){
 #
 #
 
-Moleculors$VCdistance_matrix = function(Vdistance_matrix){
+Moleculors$VCdistance_matrix = function(){
 
-  graph_VCdistance_matrix = matrix(nrow = nrow(Vdistance_matrix), ncol = nrow(Vdistance_matrix))
+  if (is.matrix(Mol_mat$graph_Vdistance_matrix)) {
+    graph_VCdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_Vdistance_matrix), ncol = nrow(Mol_mat$graph_Vdistance_matrix))
 
-  for (i in 1:nrow(graph_VCdistance_matrix)) {
-    for (j in 1:nrow(graph_VCdistance_matrix)) {
-      if (i != j) {
-        graph_VCdistance_matrix[i,j] = nrow(Vdistance_matrix) - Vdistance_matrix[i,j]
-      } else {
-        graph_VCdistance_matrix[i,j] = 0
+    for (i in 1:nrow(graph_VCdistance_matrix)) {
+      for (j in 1:nrow(graph_VCdistance_matrix)) {
+        if (i != j) {
+          graph_VCdistance_matrix[i,j] = nrow(Mol_mat$graph_Vdistance_matrix) - Mol_mat$graph_Vdistance_matrix[i,j]
+        } else {
+          graph_VCdistance_matrix[i,j] = 0
+        }
       }
     }
+    Mol_mat$graph_VCdistance_matrix = graph_VCdistance_matrix
+
+    message("Vertex complement distance matrix ... OK")
+  } else {
+    message("Vertex complement distance matrix ... FAIL")
   }
-  Moleculors$graph_VCdistance_matrix = graph_VCdistance_matrix
 }
 
 
@@ -222,69 +236,77 @@ Moleculors$VCdistance_matrix = function(Vdistance_matrix){
 #
 
 
-Moleculors$Eadj_matrix = function(Cart_Input_Hsupp, Vadjmatrix){
-  edge_matrix = matrix(nrow = nrow(Cart_Input_Hsupp),
-                       ncol = (ncol(Cart_Input_Hsupp)-1))
-  h = 1
-  counter = 1
+Moleculors$Eadj_matrix = function(Cart_Input_Hsupp){
 
-  for (i in 1:nrow(Vadjmatrix)) {
-    for (j in h:nrow(Vadjmatrix)) {
-      if (Vadjmatrix[i,j] == 1) {
-        edge_matrix[counter, 1] = (Cart_Input_Hsupp$X[i] + Cart_Input_Hsupp$X[j])/2
-        edge_matrix[counter, 2] = (Cart_Input_Hsupp$Y[i] + Cart_Input_Hsupp$Y[j])/2
-        edge_matrix[counter, 3] = (Cart_Input_Hsupp$Z[i] + Cart_Input_Hsupp$Z[j])/2
-        counter = counter + 1
+  if (is.matrix(Mol_mat$graph_Vadj_matrix)) {
+    edge_matrix = matrix(nrow = nrow(Cart_Input_Hsupp),
+                         ncol = (ncol(Cart_Input_Hsupp)-1))
+    h = 1
+    counter = 1
+
+    for (i in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
+      for (j in h:nrow(Mol_mat$graph_Vadj_matrix)) {
+        if (Mol_mat$graph_Vadj_matrix[i,j] == 1) {
+          edge_matrix[counter, 1] = (Cart_Input_Hsupp$X[i] + Cart_Input_Hsupp$X[j])/2
+          edge_matrix[counter, 2] = (Cart_Input_Hsupp$Y[i] + Cart_Input_Hsupp$Y[j])/2
+          edge_matrix[counter, 3] = (Cart_Input_Hsupp$Z[i] + Cart_Input_Hsupp$Z[j])/2
+          counter = counter + 1
+        }
+      }
+      h = h + 1
+    }
+
+    graph_Eadj_matrix = matrix(nrow = nrow(edge_matrix), ncol = nrow(edge_matrix))
+
+
+    for (i in 1:nrow(graph_Eadj_matrix)) {
+      for (j in 1:ncol(graph_Eadj_matrix)) {
+        graph_Eadj_matrix[i,j] = sqrt((edge_matrix[j,1] - edge_matrix[i,1])^2 +
+                                        (edge_matrix[j,2] - edge_matrix[i,2])^2 +
+                                        (edge_matrix[j,3] - edge_matrix[i,3])^2)
       }
     }
-    h = h + 1
-  }
 
-  graph_Eadj_matrix = matrix(nrow = nrow(edge_matrix), ncol = nrow(edge_matrix))
+    NA_vector = c()
 
-
-  for (i in 1:nrow(graph_Eadj_matrix)) {
     for (j in 1:ncol(graph_Eadj_matrix)) {
-      graph_Eadj_matrix[i,j] = sqrt((edge_matrix[j,1] - edge_matrix[i,1])^2 +
-                                      (edge_matrix[j,2] - edge_matrix[i,2])^2 +
-                                      (edge_matrix[j,3] - edge_matrix[i,3])^2)
-    }
-  }
-
-  NA_vector = c()
-
-  for (j in 1:ncol(graph_Eadj_matrix)) {
-    if (is.na(graph_Eadj_matrix[1,j]) & !(j %in% NA_vector)) {
-      NA_vector = append(NA_vector, j)
-    }
-  }
-
-  if (!(is.null(NA_vector))) {
-    graph_Eadj_matrix = graph_Eadj_matrix[-NA_vector, -NA_vector]
-  }
-
-
-  graph_Eadj_matrix = apply(graph_Eadj_matrix, 2, round, 2)
-
-  for (i in 1:nrow(graph_Eadj_matrix)) {
-    for (j in 1:nrow(graph_Eadj_matrix)) {
-      if ((graph_Eadj_matrix[i,j] - min(graph_Eadj_matrix[1,-1])) <= 0.1 & i != j) {
-        graph_Eadj_matrix[i,j] = min(graph_Eadj_matrix[1,-1])
+      if (is.na(graph_Eadj_matrix[1,j]) & !(j %in% NA_vector)) {
+        NA_vector = append(NA_vector, j)
       }
     }
-  }
 
-  graph_Eadj_matrix = apply(graph_Eadj_matrix, 2, `/`, min(graph_Eadj_matrix[1,-1]))
+    if (!(is.null(NA_vector))) {
+      graph_Eadj_matrix = graph_Eadj_matrix[-NA_vector, -NA_vector]
+    }
 
-  for (i in 1:nrow(graph_Eadj_matrix)) {
-    for (j in 1:nrow(graph_Eadj_matrix)) {
-      if (graph_Eadj_matrix[i,j] != 1) {
-        graph_Eadj_matrix[i,j] = 0
+
+    graph_Eadj_matrix = apply(graph_Eadj_matrix, 2, round, 2)
+
+    for (i in 1:nrow(graph_Eadj_matrix)) {
+      for (j in 1:nrow(graph_Eadj_matrix)) {
+        if ((graph_Eadj_matrix[i,j] - min(graph_Eadj_matrix[1,-1])) <= 0.1 & i != j) {
+          graph_Eadj_matrix[i,j] = min(graph_Eadj_matrix[1,-1])
+        }
       }
     }
+
+    graph_Eadj_matrix = apply(graph_Eadj_matrix, 2, `/`, min(graph_Eadj_matrix[1,-1]))
+
+    for (i in 1:nrow(graph_Eadj_matrix)) {
+      for (j in 1:nrow(graph_Eadj_matrix)) {
+        if (graph_Eadj_matrix[i,j] != 1) {
+          graph_Eadj_matrix[i,j] = 0
+        }
+      }
+    }
+
+    Mol_mat$graph_Eadj_matrix = graph_Eadj_matrix
+
+    message("Edge adjacency matrix ... OK")
+  } else {
+    message("Edge adjacency matrix ... FAIL")
   }
 
-  Moleculors$graph_Eadj_matrix = graph_Eadj_matrix
 }
 
 # This function takes as input the Eadjancency matrix and compute, using
@@ -293,41 +315,47 @@ Moleculors$Eadj_matrix = function(Cart_Input_Hsupp, Vadjmatrix){
 # than it loop through each connection to find the wanted connection (e.g. elemij It loop through
 # the connection of 1 until it find the element j, increasing the distance at each loop)
 
-Moleculors$Edistance_matrix = function(Eadj_Input_matrix){
+Moleculors$Edistance_matrix = function(){
 
-  graph_Edistance_matrix = matrix(nrow = nrow(Eadj_Input_matrix), ncol = nrow(Eadj_Input_matrix))
+  if (is.matrix(Mol_mat$graph_Eadj_matrix)) {
+    graph_Edistance_matrix = matrix(nrow = nrow(Mol_mat$graph_Eadj_matrix), ncol = nrow(Mol_mat$graph_Eadj_matrix))
 
-  connections = list()
-  index_counter = c()
+    connections = list()
+    index_counter = c()
 
-  for (i in 1:nrow(Eadj_Input_matrix)) {
-    connections = append(connections, list(which(Eadj_Input_matrix[i,] == 1)))
-  }
+    for (i in 1:nrow(Mol_mat$graph_Eadj_matrix)) {
+      connections = append(connections, list(which(Mol_mat$graph_Eadj_matrix[i,] == 1)))
+    }
 
 
-  for (i in 1:nrow(graph_Edistance_matrix)) {
-    for (j in 1:nrow(graph_Edistance_matrix)) {
-      d = 1
-      if (Eadj_Input_matrix[i,j] == 1) {
-        graph_Edistance_matrix[i,j] = 1
-      } else if (i == j) {
-        graph_Edistance_matrix[i,j] = 0
-      } else if (i != j & Eadj_Input_matrix[i,j] == 0) {
-        connection_vector = connections[[i]]
-        while (!(j %in% connection_vector)) {
-          connections_holder = c()
-          for (k in 1:length(connection_vector)) {
-            connections_holder = append(connections_holder, connections[[connection_vector[k]]])
+    for (i in 1:nrow(graph_Edistance_matrix)) {
+      for (j in 1:nrow(graph_Edistance_matrix)) {
+        d = 1
+        if (Mol_mat$graph_Eadj_matrix[i,j] == 1) {
+          graph_Edistance_matrix[i,j] = 1
+        } else if (i == j) {
+          graph_Edistance_matrix[i,j] = 0
+        } else if (i != j & Mol_mat$graph_Eadj_matrix[i,j] == 0) {
+          connection_vector = connections[[i]]
+          while (!(j %in% connection_vector)) {
+            connections_holder = c()
+            for (k in 1:length(connection_vector)) {
+              connections_holder = append(connections_holder, connections[[connection_vector[k]]])
+            }
+            d = d + 1
+            connection_vector = connections_holder
           }
-          d = d + 1
-          connection_vector = connections_holder
+          graph_Edistance_matrix[i,j] = d
         }
-        graph_Edistance_matrix[i,j] = d
       }
     }
-  }
 
-  Moleculors$graph_Edistance_matrix = graph_Edistance_matrix
+    Mol_mat$graph_Edistance_matrix = graph_Edistance_matrix
+
+    message("Edge distance matrix ... OK")
+  } else {
+    message("Edge distance matrix ... FAIL")
+  }
 }
 
 
@@ -335,20 +363,26 @@ Moleculors$Edistance_matrix = function(Eadj_Input_matrix){
 # This function takes as input the Edistance matrix and compute for each element
 # the complement as nrow(Edistance_matrix) - Edistance_matrix[i,j]
 
-Moleculors$ECdistance_matrix = function(Edistance_matrix){
+Moleculors$ECdistance_matrix = function(){
 
-  graph_ECdistance_matrix = matrix(nrow = nrow(Edistance_matrix), ncol = nrow(Edistance_matrix))
+  if (is.matrix(Mol_mat$graph_Edistance_matrix)) {
+    graph_ECdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_Edistance_matrix), ncol = nrow(Mol_mat$graph_Edistance_matrix))
 
-  for (i in 1:nrow(graph_ECdistance_matrix)) {
-    for (j in 1:nrow(graph_ECdistance_matrix)) {
-      if (i != j) {
-        graph_ECdistance_matrix[i,j] = nrow(Edistance_matrix) - Edistance_matrix[i,j]
-      } else {
-        graph_ECdistance_matrix[i,j] = 0
+    for (i in 1:nrow(graph_ECdistance_matrix)) {
+      for (j in 1:nrow(graph_ECdistance_matrix)) {
+        if (i != j) {
+          graph_ECdistance_matrix[i,j] = nrow(Mol_mat$graph_Edistance_matrix) - Mol_mat$graph_Edistance_matrix[i,j]
+        } else {
+          graph_ECdistance_matrix[i,j] = 0
+        }
       }
     }
+    Mol_mat$graph_ECdistance_matrix = graph_ECdistance_matrix
+
+    message("Edge distance complement matrix ... OK")
+  } else {
+    message("Edge distance complement matrix ... FAIL")
   }
-  Moleculors$graph_ECdistance_matrix = graph_ECdistance_matrix
 }
 
 
@@ -358,21 +392,26 @@ Moleculors$ECdistance_matrix = function(Edistance_matrix){
 # the distance matrix
 #
 
-Moleculors$V_Harary_matrix = function(Vdistance_matrix){
+Moleculors$V_Harary_matrix = function(){
 
-  graph_VHarary_matrix = matrix(nrow = nrow(Vdistance_matrix), ncol = nrow(Vdistance_matrix))
-  for (i in 1:nrow(Vdistance_matrix)) {
-    for (j in 1:nrow(Vdistance_matrix)) {
-      if (i != j) {
-        graph_VHarary_matrix[i,j] = 1 /Vdistance_matrix[i,j]
-      } else {
-        graph_VHarary_matrix[i,j] = 0
+  if (is.matrix(Mol_mat$graph_Vdistance_matrix)) {
+    graph_VHarary_matrix = matrix(nrow = nrow(Mol_mat$graph_Vdistance_matrix), ncol = nrow(Mol_mat$graph_Vdistance_matrix))
+    for (i in 1:nrow(Mol_mat$graph_Vdistance_matrix)) {
+      for (j in 1:nrow(Mol_mat$graph_Vdistance_matrix)) {
+        if (i != j) {
+          graph_VHarary_matrix[i,j] = 1 /Mol_mat$graph_Vdistance_matrix[i,j]
+        } else {
+          graph_VHarary_matrix[i,j] = 0
+        }
       }
     }
+
+    Mol_mat$graph_VHarary_matrix = graph_VHarary_matrix
+
+    message("Vertex Harary matrix ... OK")
+  } else {
+    message("Vertex Harary matrix ... FAIL")
   }
-
-  Moleculors$graph_VHarary_matrix = graph_VHarary_matrix
-
 }
 
 # This function compute the edge version of the so called
@@ -381,21 +420,26 @@ Moleculors$V_Harary_matrix = function(Vdistance_matrix){
 # the distance matrix
 #
 
-Moleculors$E_Harary_matrix = function(Edistance_matrix){
+Moleculors$E_Harary_matrix = function(){
 
-  graph_EHarary_matrix = matrix(nrow = nrow(Edistance_matrix), ncol = nrow(Edistance_matrix))
-  for (i in 1:nrow(Edistance_matrix)) {
-    for (j in 1:nrow(Edistance_matrix)) {
-      if (i != j) {
-        graph_EHarary_matrix[i,j] = 1 /Edistance_matrix[i,j]
-      } else {
-        graph_EHarary_matrix[i,j] = 0
+  if (is.matrix(Mol_mat$graph_Edistance_matrix)) {
+    graph_EHarary_matrix = matrix(nrow = nrow(Mol_mat$graph_Edistance_matrix), ncol = nrow(Mol_mat$graph_Edistance_matrix))
+    for (i in 1:nrow(Mol_mat$graph_Edistance_matrix)) {
+      for (j in 1:nrow(Mol_mat$graph_Edistance_matrix)) {
+        if (i != j) {
+          graph_EHarary_matrix[i,j] = 1 /Mol_mat$graph_Edistance_matrix[i,j]
+        } else {
+          graph_EHarary_matrix[i,j] = 0
+        }
       }
     }
+
+    Mol_mat$graph_EHarary_matrix = graph_EHarary_matrix
+
+    message("Edge Harary matrix ... OK")
+  } else {
+    message("Edge Harary matrix ... FAIL")
   }
-
-  Moleculors$graph_EHarary_matrix = graph_EHarary_matrix
-
 }
 
 # This function compute the vertex version of the reciprocal
@@ -404,20 +448,26 @@ Moleculors$E_Harary_matrix = function(Edistance_matrix){
 # the distance matrix
 #
 
-Moleculors$Rec_VCdistance = function(VCdistance_matrix){
+Moleculors$Rec_VCdistance = function(){
 
-  graph_RecVCdistance_matrix = matrix(nrow = nrow(VCdistance_matrix), ncol = nrow(VCdistance_matrix))
-  for (i in 1:nrow(VCdistance_matrix)) {
-    for (j in 1:nrow(VCdistance_matrix)) {
-      if (i != j) {
-        graph_RecVCdistance_matrix[i,j] = 1 /VCdistance_matrix[i,j]
-      } else {
-        graph_RecVCdistance_matrix[i,j] = 0
+  if (is.matrix(Mol_mat$graph_VCdistance_matrix)) {
+    graph_RecVCdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_VCdistance_matrix), ncol = nrow(Mol_mat$graph_VCdistance_matrix))
+    for (i in 1:nrow(Mol_mat$graph_VCdistance_matrix)) {
+      for (j in 1:nrow(Mol_mat$graph_VCdistance_matrix)) {
+        if (i != j) {
+          graph_RecVCdistance_matrix[i,j] = 1 /Mol_mat$graph_VCdistance_matrix[i,j]
+        } else {
+          graph_RecVCdistance_matrix[i,j] = 0
+        }
       }
     }
-  }
 
-  Moleculors$graph_RecVCdistance_matrix = graph_RecVCdistance_matrix
+    Mol_mat$graph_RecVCdistance_matrix = graph_RecVCdistance_matrix
+
+    message("Reciprocal vertex complement matrix ... OK")
+  } else {
+    message("Reciprocal vertex complement matrix ... FAIL")
+  }
 }
 
 
@@ -429,20 +479,26 @@ Moleculors$Rec_VCdistance = function(VCdistance_matrix){
 # the edge distance matrix
 #
 
-Moleculors$Rec_ECdistance = function(ECdistance_matrix){
+Moleculors$Rec_ECdistance = function(){
 
-  graph_RecECdistance_matrix = matrix(nrow = nrow(ECdistance_matrix), ncol = nrow(ECdistance_matrix))
-  for (i in 1:nrow(ECdistance_matrix)) {
-    for (j in 1:nrow(ECdistance_matrix)) {
-      if (i != j) {
-        graph_RecECdistance_matrix[i,j] = 1 /ECdistance_matrix[i,j]
-      } else {
-        graph_RecECdistance_matrix[i,j] = 0
+  if (is.matrix(Mol_mat$graph_ECdistance_matrix)) {
+    graph_RecECdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_ECdistance_matrix), ncol = nrow(Mol_mat$graph_ECdistance_matrix))
+    for (i in 1:nrow(Mol_mat$graph_ECdistance_matrix)) {
+      for (j in 1:nrow(Mol_mat$graph_ECdistance_matrix)) {
+        if (i != j) {
+          graph_RecECdistance_matrix[i,j] = 1 /Mol_mat$graph_ECdistance_matrix[i,j]
+        } else {
+          graph_RecECdistance_matrix[i,j] = 0
+        }
       }
     }
-  }
 
-  Moleculors$graph_RecECdistance_matrix = graph_RecECdistance_matrix
+    Mol_mat$graph_RecECdistance_matrix = graph_RecECdistance_matrix
+
+    message("Reciprocal edge complement matrix ... OK")
+  } else {
+    message("Reciprocal edge complement matrix ... FAIL")
+  }
 }
 
 
@@ -455,20 +511,26 @@ Moleculors$Rec_ECdistance = function(ECdistance_matrix){
 #
 
 
-Moleculors$Complementary_Vdistance = function(Vdistance_matrix){
+Moleculors$Complementary_Vdistance = function(){
 
-  graph_VCOMPdistance_matrix = matrix(nrow = nrow(Vdistance_matrix), ncol = nrow(Vdistance_matrix))
-  for (i in 1:nrow(Vdistance_matrix)) {
-    for (j in 1:nrow(Vdistance_matrix)) {
-      if (i != j) {
-        graph_VCOMPdistance_matrix[i,j] = 1 + max(Vdistance_matrix) - Vdistance_matrix[i,j]
-      } else {
-        graph_VCOMPdistance_matrix[i,j] = 0
+  if (is.matrix(Mol_mat$graph_Vdistance_matrix)) {
+    graph_VCOMPdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_Vdistance_matrix), ncol = nrow(Mol_mat$graph_Vdistance_matrix))
+    for (i in 1:nrow(Mol_mat$graph_Vdistance_matrix)) {
+      for (j in 1:nrow(Mol_mat$graph_Vdistance_matrix)) {
+        if (i != j) {
+          graph_VCOMPdistance_matrix[i,j] = 1 + max(Mol_mat$graph_Vdistance_matrix) - Mol_mat$graph_Vdistance_matrix[i,j]
+        } else {
+          graph_VCOMPdistance_matrix[i,j] = 0
+        }
       }
     }
-  }
 
-  Moleculors$graph_VCOMPdistance_matrix = graph_VCOMPdistance_matrix
+    Mol_mat$graph_VCOMPdistance_matrix = graph_VCOMPdistance_matrix
+
+    message("Complementary vertex matrix ... OK")
+  } else {
+    message("Complementary vertex matrix ... FAIL")
+  }
 }
 
 
@@ -481,20 +543,25 @@ Moleculors$Complementary_Vdistance = function(Vdistance_matrix){
 #
 
 
-Moleculors$Complementary_Edistance = function(Edistance_matrix){
+Moleculors$Complementary_Edistance = function(){
 
-  graph_ECOMPdistance_matrix = matrix(nrow = nrow(Edistance_matrix), ncol = nrow(Edistance_matrix))
-  for (i in 1:nrow(Edistance_matrix)) {
-    for (j in 1:nrow(Edistance_matrix)) {
-      if (i != j) {
-        graph_ECOMPdistance_matrix[i,j] = 1 + max(Edistance_matrix) - Edistance_matrix[i,j]
-      } else {
-        graph_ECOMPdistance_matrix[i,j] = 0
+  if (is.matrix(Mol_mat$graph_Edistance_matrix)) {
+    graph_ECOMPdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_Edistance_matrix), ncol = nrow(Mol_mat$graph_Edistance_matrix))
+    for (i in 1:nrow(Mol_mat$graph_Edistance_matrix)) {
+      for (j in 1:nrow(Mol_mat$graph_Edistance_matrix)) {
+        if (i != j) {
+          graph_ECOMPdistance_matrix[i,j] = 1 + max(Mol_mat$graph_Edistance_matrix) - Mol_mat$graph_Edistance_matrix[i,j]
+        } else {
+          graph_ECOMPdistance_matrix[i,j] = 0
+        }
       }
     }
-  }
 
-  Moleculors$graph_ECOMPdistance_matrix = graph_ECOMPdistance_matrix
+    Mol_mat$graph_ECOMPdistance_matrix = graph_ECOMPdistance_matrix
+    message("Complementary edge matrix ... OK")
+  } else {
+    message("Complementary edge matrix ... FAIL")
+  }
 }
 
 # This function compute the vertex version of the reciprocal
@@ -503,20 +570,25 @@ Moleculors$Complementary_Edistance = function(Edistance_matrix){
 # the distance matrix
 #
 
-Moleculors$Rec_Complementary_Vdistance = function(Complentary_Vdistance_matrix){
+Moleculors$Rec_Complementary_Vdistance = function(){
 
-  graph_VRecCOMPdistance_matrix = matrix(nrow = nrow(Complentary_Vdistance_matrix), ncol = nrow(Complentary_Vdistance_matrix))
-  for (i in 1:nrow(Complentary_Vdistance_matrix)) {
-    for (j in 1:nrow(Complentary_Vdistance_matrix)) {
-      if (i != j) {
-        graph_VRecCOMPdistance_matrix[i,j] = 1 /Complentary_Vdistance_matrix[i,j]
-      } else {
-        graph_VRecCOMPdistance_matrix[i,j] = 0
+  if (is.matrix(Mol_mat$graph_VCOMPdistance_matrix)) {
+    graph_VRecCOMPdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_VCOMPdistance_matrix), ncol = nrow(Mol_mat$graph_VCOMPdistance_matrix))
+    for (i in 1:nrow(Mol_mat$graph_VCOMPdistance_matrix)) {
+      for (j in 1:nrow(Mol_mat$graph_VCOMPdistance_matrix)) {
+        if (i != j) {
+          graph_VRecCOMPdistance_matrix[i,j] = 1 /Mol_mat$graph_VCOMPdistance_matrix[i,j]
+        } else {
+          graph_VRecCOMPdistance_matrix[i,j] = 0
+        }
       }
     }
-  }
 
-  Moleculors$graph_VRecCOMPdistance_matrix = graph_VRecCOMPdistance_matrix
+    Mol_mat$graph_VRecCOMPdistance_matrix = graph_VRecCOMPdistance_matrix
+    message("Reciprocal complementary vertex matrix ... OK")
+  } else {
+    message("Reciprocal complementary vertex matrix ... FAIL")
+  }
 }
 
 # This function compute the edge version of the reciprocal
@@ -525,20 +597,25 @@ Moleculors$Rec_Complementary_Vdistance = function(Complentary_Vdistance_matrix){
 # the distance matrix
 #
 
-Moleculors$Rec_Complementary_Edistance = function(Complentary_Edistance_matrix){
+Moleculors$Rec_Complementary_Edistance = function(){
 
-  graph_ERecCOMPdistance_matrix = matrix(nrow = nrow(Complentary_Edistance_matrix), ncol = nrow(Complentary_Edistance_matrix))
-  for (i in 1:nrow(Complentary_Edistance_matrix)) {
-    for (j in 1:nrow(Complentary_Edistance_matrix)) {
-      if (i != j) {
-        graph_ERecCOMPdistance_matrix[i,j] = 1 /Complentary_Edistance_matrix[i,j]
-      } else {
-        graph_ERecCOMPdistance_matrix[i,j] = 0
+  if (is.matrix(Mol_mat$graph_ECOMPdistance_matrix)) {
+    graph_ERecCOMPdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_ECOMPdistance_matrix), ncol = nrow(Mol_mat$graph_ECOMPdistance_matrix))
+    for (i in 1:nrow(Mol_mat$graph_ECOMPdistance_matrix)) {
+      for (j in 1:nrow(Mol_mat$graph_ECOMPdistance_matrix)) {
+        if (i != j) {
+          graph_ERecCOMPdistance_matrix[i,j] = 1 /Mol_mat$graph_ECOMPdistance_matrix[i,j]
+        } else {
+          graph_ERecCOMPdistance_matrix[i,j] = 0
+        }
       }
     }
-  }
 
-  Moleculors$graph_ERecCOMPdistance_matrix = graph_ERecCOMPdistance_matrix
+    Mol_mat$graph_ERecCOMPdistance_matrix = graph_ERecCOMPdistance_matrix
+    message("Reciprocal complementary edge matrix ... OK")
+  } else {
+    message("Reciprocal complementary edge matrix ... FAIL")
+  }
 }
 
 # This function compute the vertex version of the distance-path-matrix
@@ -547,20 +624,25 @@ Moleculors$Rec_Complementary_Edistance = function(Complentary_Edistance_matrix){
 # the distance matrix
 #
 
-Moleculors$Distance_path_Vdistance = function(Vdistance_matrix){
+Moleculors$Distance_path_Vdistance = function(){
 
-  graph_Vpathdistance_matrix = matrix(nrow = nrow(Vdistance_matrix), ncol = nrow(Vdistance_matrix))
-  for (i in 1:nrow(Vdistance_matrix)) {
-    for (j in 1:nrow(Vdistance_matrix)) {
-      if (i != j) {
-        graph_Vpathdistance_matrix[i,j] = Vdistance_matrix[i,j]*((Vdistance_matrix[i,j] + 1)/2)
-      } else {
-        graph_Vpathdistance_matrix[i,j] = 0
+  if (is.matrix(Mol_mat$graph_Vdistance_matrix)) {
+    graph_Vpathdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_Vdistance_matrix), ncol = nrow(Mol_mat$graph_Vdistance_matrix))
+    for (i in 1:nrow(Mol_mat$graph_Vdistance_matrix)) {
+      for (j in 1:nrow(Mol_mat$graph_Vdistance_matrix)) {
+        if (i != j) {
+          graph_Vpathdistance_matrix[i,j] = Mol_mat$graph_Vdistance_matrix[i,j]*((Mol_mat$graph_Vdistance_matrix[i,j] + 1)/2)
+        } else {
+          graph_Vpathdistance_matrix[i,j] = 0
+        }
       }
     }
-  }
 
-  Moleculors$graph_Vpathdistance_matrix = graph_Vpathdistance_matrix
+    Mol_mat$graph_Vpathdistance_matrix = graph_Vpathdistance_matrix
+    message("Distance path vertex matrix ... OK")
+  } else {
+    message("Distance path vertex matrix ... FAIL")
+  }
 }
 
 # This function compute the edge version of the distance-path-matrix
@@ -569,20 +651,25 @@ Moleculors$Distance_path_Vdistance = function(Vdistance_matrix){
 # the distance matrix
 #
 
-Moleculors$Distance_path_Edistance = function(Edistance_matrix){
+Moleculors$Distance_path_Edistance = function(){
 
-  graph_Epathdistance_matrix = matrix(nrow = nrow(Edistance_matrix), ncol = nrow(Edistance_matrix))
-  for (i in 1:nrow(Edistance_matrix)) {
-    for (j in 1:nrow(Edistance_matrix)) {
-      if (i != j) {
-        graph_Epathdistance_matrix[i,j] = Edistance_matrix[i,j]*((Edistance_matrix[i,j] + 1)/2)
-      } else {
-        graph_Epathdistance_matrix[i,j] = 0
+  if (is.matrix(Mol_mat$graph_Edistance_matrix)) {
+    graph_Epathdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_Edistance_matrix), ncol = nrow(Mol_mat$graph_Edistance_matrix))
+    for (i in 1:nrow(Mol_mat$graph_Edistance_matrix)) {
+      for (j in 1:nrow(Mol_mat$graph_Edistance_matrix)) {
+        if (i != j) {
+          graph_Epathdistance_matrix[i,j] = Mol_mat$graph_Edistance_matrix[i,j]*((Mol_mat$graph_Edistance_matrix[i,j] + 1)/2)
+        } else {
+          graph_Epathdistance_matrix[i,j] = 0
+        }
       }
     }
-  }
 
-  Moleculors$graph_Epathdistance_matrix = graph_Epathdistance_matrix
+    Mol_mat$graph_Epathdistance_matrix = graph_Epathdistance_matrix
+    message("Distance path vertex matrix ... OK")
+  } else {
+    message("Distance path vertex matrix ... FAIL")
+  }
 }
 
 
@@ -593,22 +680,27 @@ Moleculors$Distance_path_Edistance = function(Edistance_matrix){
 
 
 
-Moleculors$Laplacian_Vdistance = function(Vdistance_matrix){
+Moleculors$Laplacian_Vdistance = function(){
 
-  graph_Vlaplacian_matrix = matrix(nrow = nrow(Vdistance_matrix), ncol = nrow(Vdistance_matrix))
-  for (i in 1:nrow(Vdistance_matrix)) {
-    for (j in 1:nrow(Vdistance_matrix)) {
-      if (Vdistance_matrix[i,j] == 1) {
-        graph_Vlaplacian_matrix[i,j] = - 1
-      } else if (i == j){
-        graph_Vlaplacian_matrix[i,j] = sum(Vdistance_matrix[i,] == 1)
-      } else {
-        graph_Vlaplacian_matrix[i,j] = 0
+  if (is.matrix(Mol_mat$graph_Vdistance_matrix)) {
+    graph_Vlaplacian_matrix = matrix(nrow = nrow(Mol_mat$graph_Vdistance_matrix), ncol = nrow(Mol_mat$graph_Vdistance_matrix))
+    for (i in 1:nrow(Mol_mat$graph_Vdistance_matrix)) {
+      for (j in 1:nrow(Mol_mat$graph_Vdistance_matrix)) {
+        if (Mol_mat$graph_Vdistance_matrix[i,j] == 1) {
+          graph_Vlaplacian_matrix[i,j] = - 1
+        } else if (i == j){
+          graph_Vlaplacian_matrix[i,j] = sum(Mol_mat$graph_Vdistance_matrix[i,] == 1)
+        } else {
+          graph_Vlaplacian_matrix[i,j] = 0
+        }
       }
     }
-  }
 
-  Moleculors$graph_Vlaplacian_matrix = graph_Vlaplacian_matrix
+    Mol_mat$graph_Vlaplacian_matrix = graph_Vlaplacian_matrix
+    message("Laplacian vertex matrix ... OK")
+  } else {
+    message("Laplacian vertex matrix ... FAIL")
+  }
 }
 
 
@@ -619,36 +711,41 @@ Moleculors$Laplacian_Vdistance = function(Vdistance_matrix){
 
 
 
-Moleculors$Laplacian_Edistance = function(Edistance_matrix){
+Moleculors$Laplacian_Edistance = function(){
 
-  graph_Elaplacian_matrix = matrix(nrow = nrow(Edistance_matrix), ncol = nrow(Edistance_matrix))
-  for (i in 1:nrow(Edistance_matrix)) {
-    for (j in 1:nrow(Edistance_matrix)) {
-      if (Edistance_matrix[i,j] == 1) {
-        graph_Elaplacian_matrix[i,j] = - 1
-      } else if (i == j){
-        graph_Elaplacian_matrix[i,j] = sum(Edistance_matrix[i,] == 1)
-      } else {
-        graph_Elaplacian_matrix[i,j] = 0
+  if (is.matrix(Mol_mat$graph_Edistance_matrix)) {
+    graph_Elaplacian_matrix = matrix(nrow = nrow(Mol_mat$graph_Edistance_matrix), ncol = nrow(Mol_mat$graph_Edistance_matrix))
+    for (i in 1:nrow(Mol_mat$graph_Edistance_matrix)) {
+      for (j in 1:nrow(Mol_mat$graph_Edistance_matrix)) {
+        if (Mol_mat$graph_Edistance_matrix[i,j] == 1) {
+          graph_Elaplacian_matrix[i,j] = - 1
+        } else if (i == j){
+          graph_Elaplacian_matrix[i,j] = sum(Mol_mat$graph_Edistance_matrix[i,] == 1)
+        } else {
+          graph_Elaplacian_matrix[i,j] = 0
+        }
       }
     }
-  }
 
-  Moleculors$graph_Elaplacian_matrix = graph_Elaplacian_matrix
+    Mol_mat$graph_Elaplacian_matrix = graph_Elaplacian_matrix
+    message("Laplacian edge matrix ... OK")
+  } else {
+    message("Laplacian edge matrix ... FAIL")
+  }
 }
 
 # This function take as input the Vdistance matrix and an interger < then
 # nrow(vdistance) and return the adjmatrix for the k(n) neighbour
 
-Moleculors$Vadj_kneigh_matrix = function(n, Vdistance_matrix) {
+Moleculors$Vadj_kneigh_matrix = function(n) {
 
-  if (n < nrow(Vdistance_matrix) & n%%1 == 0){
-    graph_Vadj_kneigh_matrix = matrix(nrow = nrow(Vdistance_matrix), ncol = nrow(Vdistance_matrix))
+  if (is.matrix(Mol_mat$graph_Vdistance_matrix) & n < nrow(Mol_mat$graph_Vdistance_matrix) & n%%1 == 0){
+    graph_Vadj_kneigh_matrix = matrix(nrow = nrow(Mol_mat$graph_Vdistance_matrix), ncol = nrow(Mol_mat$graph_Vdistance_matrix))
 
 
-    for (i in 1:nrow(Vdistance_matrix)) {
-      for (j in 1:nrow(Vdistance_matrix)) {
-        if (i != j & Vdistance_matrix[i,j] == n){
+    for (i in 1:nrow(Mol_mat$graph_Vdistance_matrix)) {
+      for (j in 1:nrow(Mol_mat$graph_Vdistance_matrix)) {
+        if (i != j & Mol_mat$graph_Vdistance_matrix[i,j] == n){
           graph_Vadj_kneigh_matrix[i,j] = 1
         } else {
           graph_Vadj_kneigh_matrix[i,j] = 0
@@ -656,7 +753,7 @@ Moleculors$Vadj_kneigh_matrix = function(n, Vdistance_matrix) {
       }
     }
 
-    Moleculors$graph_Vadj_kneigh_matrix = graph_Vadj_kneigh_matrix
+    Mol_mat$graph_Vadj_kneigh_matrix = graph_Vadj_kneigh_matrix
 
     message(paste('Vadj_kneigh_matrix computed for n = ', n, sep = ''))
 
@@ -669,18 +766,18 @@ Moleculors$Vadj_kneigh_matrix = function(n, Vdistance_matrix) {
 # This function takes as input the adjacency matrix and an integer n and
 # return the n power of the adjacency matrix.
 
-Moleculors$Vadj_highpower_matrix = function(n, Vadj_Input_matrix){
+Moleculors$Vadj_highpower_matrix = function(n){
 
-  if (n%%1 == 0){
+  if (is.matrix(Mol_mat$graph_Vadj_matrix) & n%%1 == 0){
 
-    graph_Vadj_highpower_matrix = Vadj_Input_matrix
+    graph_Vadj_highpower_matrix = is.matrix(Mol_mat$graph_Vdistance_matrix)
 
     for (i in 2:n) {
 
-      graph_Vadj_highpower_matrix = graph_Vadj_highpower_matrix %*% Vadj_Input_matrix
+      graph_Vadj_highpower_matrix = graph_Vadj_highpower_matrix %*% is.matrix(Mol_mat$graph_Vdistance_matrix)
     }
 
-    Moleculors$graph_vadj_highpower_matrix = graph_Vadj_highpower_matrix
+    Mol_mat$graph_vadj_highpower_matrix = graph_Vadj_highpower_matrix
 
     message(paste('Vadj_highpower_matrix computed for n = ', n, sep =''))
 

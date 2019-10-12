@@ -10,7 +10,12 @@ library(gWidgets2RGtk2)
 
 # Gui initialization with loader and calculators.
 
-file_uploader = function(){
+Moleculors_GUI = function(){
+
+  environment(calc_matrix) <- environment()
+  environment(vis_descriptor) = environment()
+  environment(file_dump) = environment()
+
 
   load_win = gwindow("Moleculors GUI")
 
@@ -27,10 +32,8 @@ file_uploader = function(){
     "Upload Cartesian Coordinates",
     container = upload_grp,
     handler = function(h, ...){
-      Moleculors$Molecular_input()
-      cartesian_output = gtable(Moleculors$Input, container = welcome_grp)
-      calc_matrix()
-
+      Moleculors$molecular_input()
+      cartesian_output = gtable(Mol_mat$input, container = welcome_grp)
     }
   )
 
@@ -45,16 +48,23 @@ file_uploader = function(){
     container = upload_grp
   )
 
+  calc_matrix()
+  vis_descriptor()
+  file_dump()
+
+
   status_bar = gstatusbar("", container = load_win)
 
-  #oD descriptors to be calculated with the cartesian loading
 }
 
 
-#Molecular graphical matricex calculation and visualization
+# Molecular graphical matricex calculation and visualization
 
 
 calc_matrix = function(){
+
+
+
   graph_matrices_grp = ggroup(horizontal = FALSE,
                               container = upload_grp)
   matrices_calc_btn = gbutton(
@@ -64,7 +74,7 @@ calc_matrix = function(){
       Moleculors$graphical_matrix()
       #matrix_picker = gmenu(c(),
                              #container = graph_matrices_grp)
-      vis_descriptor()
+
     }
   )
 }
@@ -72,15 +82,40 @@ calc_matrix = function(){
 # Molecular descriptos calculation and visualization
 
 vis_descriptor = function() {
+
+
+
   descriptor_grp = ggroup(horizontal = FALSE,
                           container = upload_grp)
+
+
   descriptor_calc_btn = gbutton(
-    "2D_Molecular descriptors calculation",
+    "Molecular descriptors calculation",
     container = descriptor_grp,
     handler = function(h, ...){
-      # calculation function
+      Moleculors$descriptor_launcher()
       #descriptor_picker = gmenu(c(),
-                            #container = descriptor_grp)
+      #container = descriptor_grp)
+
     }
   )
 }
+
+
+# Output file saving options
+
+file_dump = function(){
+
+  dumper_grp = ggroup(horizontal = FALSE,
+                          container = upload_grp)
+
+  dumper_btn = gbutton(
+    "Download output file",
+    container = dumper_grp,
+    handler = function(h, ...){
+
+    }
+  )
+}
+
+

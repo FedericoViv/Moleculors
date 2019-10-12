@@ -9,17 +9,25 @@
 # this index is calculated as half of the summatory of the summatory of the distances in each
 # row of the graphical matrix
 
-Moleculors$Wiener_index_calc = function(Vdistance_matrix){
+Moleculors$Wiener_index_calc = function(){
 
-  W = 0
+  if (is.matrix(Mol_mat$graph_Vdistance_matrix)) {
 
-  for (i in 1:nrow(Vdistance_matrix)) {
+    W = 0
 
-      W = W + sum(Vdistance_matrix[i,])
+    for (i in 1:nrow(Mol_mat$graph_Vdistance_matrix)) {
 
+      W = W + sum(Mol_mat$graph_Vdistance_matrix[i,])
+
+    }
+
+    Output_descp$W_index = 0.5 * W
+
+    message("Wiener index ... OK")
+
+  } else {
+    message("Wiener index ... FAIL")
   }
-
-  Moleculors$W_index = 0.5 * W
 }
 
 
@@ -27,17 +35,25 @@ Moleculors$Wiener_index_calc = function(Vdistance_matrix){
 # this number is calculated as the summatory of the summatory of each elementij in each row
 # of the adjacency matrix
 
-Moleculors$Platt_number_calc = function(Eadj_Input_matrix){
+Moleculors$Platt_number_calc = function(){
 
-  Platt = 0
+  if (is.matrix(Mol_mat$graph_Eadj_matrix)) {
 
-  for (i in 1:nrow(Eadj_Input_matrix)) {
+    Platt = 0
 
-    Platt = Platt + sum(Eadj_Input_matrix[i,])
+    for (i in 1:nrow(Mol_mat$graph_Eadj_matrix)) {
 
+      Platt = Platt + sum(Mol_mat$graph_Eadj_matrix[i,])
+
+    }
+
+    Output_descp$Platt_number = Platt
+
+    message("Platt number ... OK")
+
+  } else {
+    message("Platt number ... FAIL")
   }
-
-  Moleculors$Platt_number = Platt
 }
 
 
@@ -46,19 +62,25 @@ Moleculors$Platt_number_calc = function(Eadj_Input_matrix){
 # the Zagreb index for the selected molecular graph as the summatory
 # of the squared degree for each atom of the matrix
 
-Moleculors$Zagreb_index_calc = function(VLaplacian_matrix){
+Moleculors$Zagreb_index_calc = function(){
 
-  Zagreb = 0
+  if (is.matrix(Mol_mat$graph_Vlaplacian_matrix)) {
+    Zagreb = 0
 
-  for (i in 1:nrow(VLaplacian_matrix)) {
-    for (j in 1:nrow(VLaplacian_matrix)) {
-      if (i == j) {
-        Zagreb = Zagreb + (VLaplacian_matrix[i,j] * VLaplacian_matrix[i,j])
+    for (i in 1:nrow(Mol_mat$graph_Vlaplacian_matrix)) {
+      for (j in 1:nrow(Mol_mat$graph_Vlaplacian_matrix)) {
+        if (i == j) {
+          Zagreb = Zagreb + (Mol_mat$graph_Vlaplacian_matrix[i,j] * Mol_mat$graph_Vlaplacian_matrix[i,j])
+        }
       }
     }
-  }
 
-  Moleculors$Zagreb_index = Zagreb
+    Output_descp$Zagreb_index = Zagreb
+
+    message("Zagreb index ... OK")
+  } else {
+    message("Zagreb index ... FAIL")
+  }
 }
 
 
@@ -70,22 +92,28 @@ Moleculors$Zagreb_index_calc = function(VLaplacian_matrix){
 # called cyclomatic number
 
 
-Moleculors$Balaban_index_calc = function(Vdistance_matrix, Vadj_Input_matrix, Eadj_Input_matrix){
+Moleculors$Balaban_index_calc = function(){
 
-  u = nrow(Eadj_Input_matrix) - nrow(Vadj_Input_matrix) + 1
+  if (is.matrix(Mol_mat$graph_Vdistance_matrix) & is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Eadj_matrix)) {
+    u = nrow(Mol_mat$graph_Eadj_matrix) - nrow(Mol_mat$graph_Vadj_matrix) + 1
 
-  J = 0
+    J = 0
 
-  for (i in 1:nrow(Vdistance_matrix)) {
-    for (j in 1:nrow(Vdistance_matrix)) {
-      if (j > i & Vadj_Input_matrix[i,j] == 1) {
-        J = J + (sum(Vdistance_matrix[i,]) * sum(Vdistance_matrix[j,]))^-0.5
+    for (i in 1:nrow(Mol_mat$graph_Vdistance_matrix)) {
+      for (j in 1:nrow(Mol_mat$graph_Vdistance_matrix)) {
+        if (j > i & Mol_mat$graph_Vadj_matrix[i,j] == 1) {
+          J = J + (sum(Mol_mat$graph_Vdistance_matrix[i,]) * sum(Mol_mat$graph_Vdistance_matrix[j,]))^-0.5
+        }
       }
     }
+
+    J = (nrow(Mol_mat$graph_Eadj_matrix)/(u + 1)) * J
+
+    Output_descp$Balaban_index = J
+
+    message("Balaban index ... OK")
+  } else {
+    message("Balaban index ... FAIL")
   }
-
-  J = (nrow(Eadj_Input_matrix)/(u + 1)) * J
-
-  Moleculors$Balaban_index = J
-
 }
+

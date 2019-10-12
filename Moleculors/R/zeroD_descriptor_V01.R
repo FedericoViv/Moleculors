@@ -6,7 +6,7 @@
 
 Moleculors$molecular_weight = function(){
 
-  if (is.data.frame(Moleculors$Input)) {
+  if (is.data.frame(Mol_mat$input)) {
 
     Weight_library = read.csv("tables/weight_table.csv")
 
@@ -19,13 +19,13 @@ Moleculors$molecular_weight = function(){
 
   weight_vector = vector()
 
-  for (i in 1:nrow(Moleculors$Input)) {
+  for (i in 1:nrow(Mol_mat$input)) {
 
-    weight_vector[i] = Weight_library$Weight[Weight_library$Symbol == as.character(Moleculors$Input$Atom[i])]
+    weight_vector[i] = Weight_library$Weight[Weight_library$Symbol == as.character(Mol_mat$input$Atom[i])]
 
   }
 
-  Moleculors$Weight = sum(weight_vector)
+  Output_descp$Weight = sum(weight_vector)
 
   return(message("Weight... Ok"))
 
@@ -39,9 +39,9 @@ Moleculors$molecular_weight = function(){
 
 Moleculors$N_atoms = function(){
 
-  if(is.data.frame(Moleculors$Input)){
+  if(is.data.frame(Mol_mat$input)){
 
-    Moleculors$Natoms = nrow(Moleculors$Input)
+    Output_descp$Natoms = nrow(Mol_mat$input)
 
   } else {
 

@@ -7,7 +7,7 @@
 #
 #
 
-Moleculors$Molecular_input = function(){
+Moleculors$molecular_input = function(){
 
   cartesian_csv = tryCatch({ cartesian_csv = read.csv(file.choose(),
                                                       header = FALSE)
@@ -35,8 +35,9 @@ Moleculors$Molecular_input = function(){
 
   print(cartesian_csv)
 
-  Moleculors$Input = cartesian_csv
+  Mol_mat$input = cartesian_csv
 
   return(message("Loading successful"))
 
 }
+
