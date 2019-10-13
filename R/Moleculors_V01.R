@@ -6,18 +6,22 @@
 # matrices will belong to the Mol_mat envinroment and molecular descriptor to
 # Ouput_descp
 
-Moleculors = new.env()
-Mol_mat = new.env()
-Output_descp = new.env()
+Moleculors_init = function(GUI = TRUE){
 
-source("R/Molecular_Input_v01.R")
-source("R/Molecular_graph_V01.R")
-source("R/GUI_V01.R")
-source("R/zeroD_descriptor_V01.R")
-source("R/twoD_descriptor_V01.R")
-source("R/descriptor_launcher_V01.R")
+  assign("Moleculors", new.env(), envir = .GlobalEnv)
+  assign("Mol_mat", new.env(), envir = .GlobalEnv)
+  assign("Output_descp", new.env(), envir = .GlobalEnv)
+
+  source("R/Molecular_Input_v01.R")
+  source("R/Molecular_graph_V01.R")
+  source("R/GUI_V01.R")
+  source("R/zeroD_descriptor_V01.R")
+  source("R/twoD_descriptor_V01.R")
+  source("R/descriptor_launcher_V01.R")
 
 
 
-
-Moleculors_GUI()
+  if (GUI == TRUE) {
+    Moleculors_GUI()
+  }
+}

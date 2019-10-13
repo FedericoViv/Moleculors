@@ -25,9 +25,6 @@ Moleculors$Hosoya_index_calc = function(Vadj_Input_matrix, Eadj_Input_matrix){
 
 
 
-
-
-
 # This function return the Szeged matrix for the vertex distance matrix
 # it take as input the Vdistance_matrix and for each element return
 # -1 if elemij = 1 and 0 if i = j

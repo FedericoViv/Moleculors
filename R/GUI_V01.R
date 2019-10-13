@@ -13,27 +13,26 @@ library(gWidgets2RGtk2)
 Moleculors_GUI = function(){
 
   environment(calc_matrix) <- environment()
-  environment(vis_descriptor) = environment()
-  environment(file_dump) = environment()
-
+  environment(vis_descriptor) <- environment()
+  environment(file_dump) <- environment()
 
   load_win = gwindow("Moleculors GUI")
+  main_grp = ggroup(container = load_win, horizontal = FALSE)
 
-  welcome_grp = ggroup(container = load_win, horizontal = FALSE)
+  header = glayout(container = main_grp)
+  body = glayout(container = main_grp)
+  tail = glayout(container = main_grp)
 
-  lbl_welcome_msg = glabel(
+  header[1,1] = glabel(
     "Welcome to the Moleculors loading service",
-    container = welcome_grp
   )
 
-  upload_grp = ggroup(container = welcome_grp)
-
-  upload_btn = gbutton(
+  body[1,1] = gbutton(
     "Upload Cartesian Coordinates",
-    container = upload_grp,
     handler = function(h, ...){
-      Moleculors$molecular_input()
-      cartesian_output = gtable(Mol_mat$input, container = welcome_grp)
+      text_show_load = capture.output(Moleculors$molecular_input(), type = "message")
+      body[31:32,1:2] = glabel(text_show_load)
+      body[2:30,1:2] = gtable(Mol_mat$input)
     }
   )
 
@@ -42,10 +41,9 @@ Moleculors_GUI = function(){
     unname(Sys.localeconv()["decimal_point"] == ",")
   }
 
-  chk_eurostyle <- gcheckbox(
+  body[1,2] <- gcheckbox(
     text      = "Use comma for decimal place",
     checked   = decimal_place(),
-    container = upload_grp
   )
 
   calc_matrix()
@@ -55,6 +53,7 @@ Moleculors_GUI = function(){
 
   status_bar = gstatusbar("", container = load_win)
 
+
 }
 
 
@@ -63,18 +62,16 @@ Moleculors_GUI = function(){
 
 calc_matrix = function(){
 
-
-
-  graph_matrices_grp = ggroup(horizontal = FALSE,
-                              container = upload_grp)
-  matrices_calc_btn = gbutton(
+  body[1,5] = gbutton(
     "Graphical matrices calculation",
-    container = graph_matrices_grp,
     handler = function(h, ...){
-      Moleculors$graphical_matrix()
-      #matrix_picker = gmenu(c(),
-                             #container = graph_matrices_grp)
-
+      text_show_graph = capture.output(Moleculors$graphical_matrix(), type = "message")
+      tail[2,30] = glabel(text_show_graph)
+      picker_list = names(Mol_mat)
+      body[2,5:10] = gcombobox(picker_list,
+                            handler = function(h, ...){
+                              body[3:20,5:20] = gtable(get(svalue(h$obj), envir = Mol_mat))
+                            })
     }
   )
 }
@@ -83,20 +80,16 @@ calc_matrix = function(){
 
 vis_descriptor = function() {
 
-
-
-  descriptor_grp = ggroup(horizontal = FALSE,
-                          container = upload_grp)
-
-
-  descriptor_calc_btn = gbutton(
+  body[1,40] = gbutton(
     "Molecular descriptors calculation",
-    container = descriptor_grp,
     handler = function(h, ...){
-      Moleculors$descriptor_launcher()
-      #descriptor_picker = gmenu(c(),
-      #container = descriptor_grp)
-
+      text_show_desc = capture.output(Moleculors$descriptor_launcher(), type = "message")
+      tail[2,60] = glabel(text_show_desc)
+      picker_list = names(Output_descp)
+      body[2,40] = gcombobox(picker_list,
+                               handler = function(h, ...){
+                                 body[3:20,40] = gtable(get(svalue(h$obj), envir = Output_descp))
+                               })
     }
   )
 }
@@ -106,12 +99,8 @@ vis_descriptor = function() {
 
 file_dump = function(){
 
-  dumper_grp = ggroup(horizontal = FALSE,
-                          container = upload_grp)
-
-  dumper_btn = gbutton(
+  tail[1,1] = gbutton(
     "Download output file",
-    container = dumper_grp,
     handler = function(h, ...){
 
     }
