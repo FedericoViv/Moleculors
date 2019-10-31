@@ -18,7 +18,6 @@
 
 Moleculors_init = function(GUI = TRUE){
 
-  assign("Moleculors", new.env(), envir = .GlobalEnv)
   assign("Mol_mat", new.env(), envir = .GlobalEnv)
   assign("Output_descp", new.env(), envir = .GlobalEnv)
 

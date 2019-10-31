@@ -1,7 +1,7 @@
 ## This source file contain all the necessary functions to compute several
 # graphical matrix necessary for the further computation of twoD descriptors (TOPOLOGICAL)
 # The main function graphical_matrix() Calls every grpahical function and warn the user
-# if any of the computation failed. Each matrix is then stored in the Moleculors environment
+# if any of the computation failed. Each matrix is then stored in the Mol_mat environment
 # for future use.
 
 #' Moleculors graphical matrices calculator
@@ -17,19 +17,16 @@
 #' between two adjacent atoms and then the distance and adjacency is computed using the previuos
 #' algorithm
 #'
-#' @name Moleculors$graphical_matrix
-#'
-#' @usage Moleculors$graphical_matrix()
 #'
 #' @return Graphical matrices for edges and verteces stored inside the Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$graphical_matrix()
+#' graphical_matrix()
 #'
 #' @export
 
 
-Moleculors$graphical_matrix = function(){
+graphical_matrix = function(){
 
   if(is.data.frame(Mol_mat$input)){
 
@@ -50,45 +47,45 @@ Moleculors$graphical_matrix = function(){
     }
 
 
-    Moleculors$Vadj_matrix(input_H_suppressed)
+    Vadj_matrix(input_H_suppressed)
 
-    Moleculors$Vdistance_matrix()
+    Vdistance_matrix()
 
-    Moleculors$VCdistance_matrix()
+    VCdistance_matrix()
 
-    Moleculors$Eadj_matrix(input_H_suppressed)
+    Eadj_matrix(input_H_suppressed)
 
-    Moleculors$Edistance_matrix()
+    Edistance_matrix()
 
-    Moleculors$ECdistance_matrix()
+    ECdistance_matrix()
 
-    Moleculors$V_Harary_matrix()
+    V_Harary_matrix()
 
-    Moleculors$E_Harary_matrix()
+    E_Harary_matrix()
 
-    Moleculors$Rec_VCdistance()
+    Rec_VCdistance()
 
-    Moleculors$Rec_ECdistance()
+    Rec_ECdistance()
 
-    Moleculors$Complementary_Vdistance()
+    Complementary_Vdistance()
 
-    Moleculors$Complementary_Edistance()
+    Complementary_Edistance()
 
-    Moleculors$Rec_Complementary_Vdistance()
+    Rec_Complementary_Vdistance()
 
-    Moleculors$Rec_Complementary_Edistance()
+    Rec_Complementary_Edistance()
 
-    Moleculors$Distance_path_Vdistance()
+    Distance_path_Vdistance()
 
-    Moleculors$Distance_path_Edistance()
+    Distance_path_Edistance()
 
-    Moleculors$Laplacian_Vdistance()
+    Laplacian_Vdistance()
 
-    Moleculors$Laplacian_Edistance()
+    Laplacian_Edistance()
 
-    Moleculors$Vadj_kneigh_matrix(2)
+    Vadj_kneigh_matrix(2)
 
-    Moleculors$Vadj_highpower_matrix(2)
+    Vadj_highpower_matrix(2)
 
 
 
@@ -115,21 +112,18 @@ Moleculors$graphical_matrix = function(){
 #' the same value for the normalization step following later.
 #' a normalization is the computed and  every other value different from 1 is set to 0
 #'
-#' @name Moleculors$Vadj_matrix
-#'
-#' @usage Moleculors$Vadj_matrix()
 #'
 #' @param Cart_Input_Hsupp Cartesian coordinates of the molecule without the hydrogen atoms
 #'
 #' @return Vertex adjacency matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$Vadj_matrix(input_H_suppressed)
+#' Vadj_matrix(input_H_suppressed)
 #'
 #' @export
 #'
 
-Moleculors$Vadj_matrix = function(Cart_Input_Hsupp){
+Vadj_matrix = function(Cart_Input_Hsupp){
 
   graph_Vadj_matrix = matrix(nrow = nrow(Cart_Input_Hsupp), ncol = nrow(Cart_Input_Hsupp))
 
@@ -179,21 +173,18 @@ Moleculors$Vadj_matrix = function(Cart_Input_Hsupp){
 #' a new vector is created with all the connection of the atom to which the first atoms was connected
 #' this is looped increasing distance at each failed loop to detect the interested element.
 #'
-#' @name Moleculors$Vdistance_matrix
-#'
-#' @usage Moleculors$Vdistance_matrix()
 #'
 #' @return Vertex distance matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$Vdistance_matrix()
+#' Vdistance_matrix()
 #'
 #' @export
 #'
 
 
 
-Moleculors$Vdistance_matrix = function(){
+Vdistance_matrix = function(){
 
   if (is.matrix(Mol_mat$graph_Vadj_matrix)) {
     graph_Vdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_Vadj_matrix), ncol = nrow(Mol_mat$graph_Vadj_matrix))
@@ -242,21 +233,18 @@ Moleculors$Vdistance_matrix = function(){
 #' This function requires the Vdistance_matrix in order to compute the complement
 #'  of the distance matrix. Each element is set has nrowVdistance - Vdistanceij
 #'
-#' @name Moleculors$VCdistance_matrix
-#'
-#' @usage Moleculors$VCdistance_matrix()
 #'
 #' @return Vertex complement distance matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$VCdistance_matrix()
+#' VCdistance_matrix()
 #'
 #' @export
 #'
 
 
 
-Moleculors$VCdistance_matrix = function(){
+VCdistance_matrix = function(){
 
   if (is.matrix(Mol_mat$graph_Vdistance_matrix)) {
     graph_VCdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_Vdistance_matrix), ncol = nrow(Mol_mat$graph_Vdistance_matrix))
@@ -284,22 +272,19 @@ Moleculors$VCdistance_matrix = function(){
 #' and the adjagency matrix for the vertexes in order to compute
 #' the edge cartesian matrix and the adjacency edges matrices.
 #'
-#' @name Moleculors$Eadj_matrix
-#'
-#' @usage Moleculors$Eadj_matrix()
 #'
 #' @param Cart_Input_Hsupp Cartesian coordinates of the molecule without the hydrogen atoms
 #'
 #' @return Edge adjacency matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$Eadj_matrix(input_H_suppressed)
+#' Eadj_matrix(input_H_suppressed)
 #'
 #' @export
 #'
 
 
-Moleculors$Eadj_matrix = function(Cart_Input_Hsupp){
+Eadj_matrix = function(Cart_Input_Hsupp){
 
   if (is.matrix(Mol_mat$graph_Vadj_matrix)) {
     edge_matrix = matrix(nrow = nrow(Cart_Input_Hsupp),
@@ -380,20 +365,17 @@ Moleculors$Eadj_matrix = function(Cart_Input_Hsupp){
 #' than it loop through each connection to find the wanted connection 'e.g. elemij It loop through
 #' the connection of 1 until it find the element j, increasing the distance at each loop'
 #'
-#' @name Moleculors$Edistance_matrix
-#'
-#' @usage Moleculors$Edistance_matrix()
 #'
 #' @return Edge distance matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$Edistance_matrix()
+#' Edistance_matrix()
 #'
 #' @export
 #'
 
 
-Moleculors$Edistance_matrix = function(){
+Edistance_matrix = function(){
 
   if (is.matrix(Mol_mat$graph_Eadj_matrix)) {
     graph_Edistance_matrix = matrix(nrow = nrow(Mol_mat$graph_Eadj_matrix), ncol = nrow(Mol_mat$graph_Eadj_matrix))
@@ -441,20 +423,17 @@ Moleculors$Edistance_matrix = function(){
 #' This function takes as input the Edistance matrix and compute for each element
 #' the complement as nrowEdistance_matrix - Edistance_matrixi,j
 #'
-#' @name Moleculors$ECdistance_matrix
-#'
-#' @usage Moleculors$ECdistance_matrix()
 #'
 #' @return Edge complement distance matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$ECdistance_matrix()
+#' ECdistance_matrix()
 #'
 #' @export
 #'
 
 
-Moleculors$ECdistance_matrix = function(){
+ECdistance_matrix = function(){
 
   if (is.matrix(Mol_mat$graph_Edistance_matrix)) {
     graph_ECdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_Edistance_matrix), ncol = nrow(Mol_mat$graph_Edistance_matrix))
@@ -484,20 +463,17 @@ Moleculors$ECdistance_matrix = function(){
 #' element of the matrix if i != j it returns the reciprocal value of
 #' the distance matrix
 #'
-#' @name Moleculors$V_Harary_matrix
-#'
-#' @usage Moleculors$V_Harary_matrix()
 #'
 #' @return Vertex Harary matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$V_Harary_matrix()
+#' V_Harary_matrix()
 #'
 #' @export
 #'
 
 
-Moleculors$V_Harary_matrix = function(){
+V_Harary_matrix = function(){
 
   if (is.matrix(Mol_mat$graph_Vdistance_matrix)) {
     graph_VHarary_matrix = matrix(nrow = nrow(Mol_mat$graph_Vdistance_matrix), ncol = nrow(Mol_mat$graph_Vdistance_matrix))
@@ -527,20 +503,17 @@ Moleculors$V_Harary_matrix = function(){
 #' element of the matrix if i != j it returns the reciprocal value of
 #' the distance matrix
 #'
-#' @name Moleculors$E_Harary_matrix
-#'
-#' @usage Moleculors$E_Harary_matrix()
 #'
 #' @return Edge Harary matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$E_Harary_matrix()
+#' E_Harary_matrix()
 #'
 #' @export
 #'
 
 
-Moleculors$E_Harary_matrix = function(){
+E_Harary_matrix = function(){
 
   if (is.matrix(Mol_mat$graph_Edistance_matrix)) {
     graph_EHarary_matrix = matrix(nrow = nrow(Mol_mat$graph_Edistance_matrix), ncol = nrow(Mol_mat$graph_Edistance_matrix))
@@ -570,20 +543,17 @@ Moleculors$E_Harary_matrix = function(){
 #' element of the matrix if i != j it returns the reciprocal value of
 #' the distance matrix
 #'
-#' @name Moleculors$Rec_VCdistance
-#'
-#' @usage Moleculors$Rec_VCdistance()
 #'
 #' @return Vertex reciprocal complement matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$Rec_VCdistance()
+#' Rec_VCdistance()
 #'
 #' @export
 #'
 
 
-Moleculors$Rec_VCdistance = function(){
+Rec_VCdistance = function(){
 
   if (is.matrix(Mol_mat$graph_VCdistance_matrix)) {
     graph_RecVCdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_VCdistance_matrix), ncol = nrow(Mol_mat$graph_VCdistance_matrix))
@@ -613,20 +583,17 @@ Moleculors$Rec_VCdistance = function(){
 #' element of the matrix if i != j it returns the reciprocal value of
 #' the distance matrix
 #'
-#' @name Moleculors$Rec_ECdistance
-#'
-#' @usage Moleculors$Rec_ECdistance()
 #'
 #' @return Edge reciprocal complement matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$Rec_ECdistance()
+#' Rec_ECdistance()
 #'
 #' @export
 #'
 
 
-Moleculors$Rec_ECdistance = function(){
+Rec_ECdistance = function(){
 
   if (is.matrix(Mol_mat$graph_ECdistance_matrix)) {
     graph_RecECdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_ECdistance_matrix), ncol = nrow(Mol_mat$graph_ECdistance_matrix))
@@ -659,20 +626,16 @@ Moleculors$Rec_ECdistance = function(){
 #' of the vertex distance matrix
 #'
 #'
-#' @name Moleculors$Complementary_Vdistance
-#'
-#' @usage Moleculors$Complementary_Vdistance()
-#'
 #' @return Vertex reciprocal matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$Complementary_Vdistance()
+#' Complementary_Vdistance()
 #'
 #' @export
 #'
 
 
-Moleculors$Complementary_Vdistance = function(){
+Complementary_Vdistance = function(){
 
   if (is.matrix(Mol_mat$graph_Vdistance_matrix)) {
     graph_VCOMPdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_Vdistance_matrix), ncol = nrow(Mol_mat$graph_Vdistance_matrix))
@@ -704,20 +667,17 @@ Moleculors$Complementary_Vdistance = function(){
 #' of the edge distance matrix
 #'
 #'
-#' @name Moleculors$Complementary_Edistance
-#'
-#' @usage Moleculors$Complementary_Edistance()
 #'
 #' @return Edge complementary matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$Complementary_Edistance()
+#' Complementary_Edistance()
 #'
 #' @export
 #'
 
 
-Moleculors$Complementary_Edistance = function(){
+Complementary_Edistance = function(){
 
   if (is.matrix(Mol_mat$graph_Edistance_matrix)) {
     graph_ECOMPdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_Edistance_matrix), ncol = nrow(Mol_mat$graph_Edistance_matrix))
@@ -746,20 +706,16 @@ Moleculors$Complementary_Edistance = function(){
 #' the distance matrix
 #'
 #'
-#' @name Moleculors$Rec_Complementary_Vdistance
-#'
-#' @usage Moleculors$Rec_Complementary_Vdistance()
-#'
 #' @return Vertex reciprocal complementary matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$Rec_Complementary_Vdistance()
+#' Rec_Complementary_Vdistance()
 #'
 #' @export
 #'
 
 
-Moleculors$Rec_Complementary_Vdistance = function(){
+Rec_Complementary_Vdistance = function(){
 
   if (is.matrix(Mol_mat$graph_VCOMPdistance_matrix)) {
     graph_VRecCOMPdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_VCOMPdistance_matrix), ncol = nrow(Mol_mat$graph_VCOMPdistance_matrix))
@@ -788,20 +744,16 @@ Moleculors$Rec_Complementary_Vdistance = function(){
 #' the distance matrix
 #'
 #'
-#' @name Moleculors$Rec_Complementary_Edistance
-#'
-#' @usage Moleculors$Rec_Complementary_Edistance()
-#'
 #' @return Edge reciprocal complementary matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$Rec_Complementary_Edistance()
+#' Rec_Complementary_Edistance()
 #'
 #' @export
 #'
 
 
-Moleculors$Rec_Complementary_Edistance = function(){
+Rec_Complementary_Edistance = function(){
 
   if (is.matrix(Mol_mat$graph_ECOMPdistance_matrix)) {
     graph_ERecCOMPdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_ECOMPdistance_matrix), ncol = nrow(Mol_mat$graph_ECOMPdistance_matrix))
@@ -830,20 +782,17 @@ Moleculors$Rec_Complementary_Edistance = function(){
 #' the distance matrix
 #'
 #'
-#' @name Moleculors$Distance_path_Vdistance
-#'
-#' @usage Moleculors$Distance_path_Vdistance()
 #'
 #' @return Vertex distance path matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$Distance_path_Vdistance()
+#' Distance_path_Vdistance()
 #'
 #' @export
 #'
 
 
-Moleculors$Distance_path_Vdistance = function(){
+Distance_path_Vdistance = function(){
 
   if (is.matrix(Mol_mat$graph_Vdistance_matrix)) {
     graph_Vpathdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_Vdistance_matrix), ncol = nrow(Mol_mat$graph_Vdistance_matrix))
@@ -872,20 +821,16 @@ Moleculors$Distance_path_Vdistance = function(){
 #' the distance matrix
 #'
 #'
-#' @name Moleculors$Distance_path_Edistance
-#'
-#' @usage Moleculors$Distance_path_Edistance()
-#'
 #' @return Edge distance path matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$Distance_path_Edistance()
+#' Distance_path_Edistance()
 #'
 #' @export
 #'
 
 
-Moleculors$Distance_path_Edistance = function(){
+Distance_path_Edistance = function(){
 
   if (is.matrix(Mol_mat$graph_Edistance_matrix)) {
     graph_Epathdistance_matrix = matrix(nrow = nrow(Mol_mat$graph_Edistance_matrix), ncol = nrow(Mol_mat$graph_Edistance_matrix))
@@ -914,20 +859,16 @@ Moleculors$Distance_path_Edistance = function(){
 #' and 0 for every other element
 #'
 #'
-#' @name Moleculors$Laplacian_Vdistance
-#'
-#' @usage Moleculors$Laplacian_Vdistance()
-#'
 #' @return Laplacian vertex matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$Laplacian_Vdistance()
+#' Laplacian_Vdistance()
 #'
 #' @export
 #'
 
 
-Moleculors$Laplacian_Vdistance = function(){
+Laplacian_Vdistance = function(){
 
   if (is.matrix(Mol_mat$graph_Vdistance_matrix)) {
     graph_Vlaplacian_matrix = matrix(nrow = nrow(Mol_mat$graph_Vdistance_matrix), ncol = nrow(Mol_mat$graph_Vdistance_matrix))
@@ -958,20 +899,16 @@ Moleculors$Laplacian_Vdistance = function(){
 #' and 0 for every other element
 #'
 #'
-#' @name Moleculors$Laplacian_Edistance
-#'
-#' @usage Moleculors$Laplacian_Edistance()
-#'
 #' @return Laplacian edge matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$Laplacian_Edistance()
+#' Laplacian_Edistance()
 #'
 #' @export
 #'
 
 
-Moleculors$Laplacian_Edistance = function(){
+Laplacian_Edistance = function(){
 
   if (is.matrix(Mol_mat$graph_Edistance_matrix)) {
     graph_Elaplacian_matrix = matrix(nrow = nrow(Mol_mat$graph_Edistance_matrix), ncol = nrow(Mol_mat$graph_Edistance_matrix))
@@ -1000,22 +937,18 @@ Moleculors$Laplacian_Edistance = function(){
 #' nrow'vdistance' and return the adjmatrix for the kn neighbour
 #'
 #'
-#' @name Moleculors$Vadj_kneigh_matrix
-#'
-#' @usage Moleculors$Vadj_kneigh_matrix()
-#'
 #' @param n integer for kn neighbour
 #'
 #' @return K neighbour vertex matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$Vadj_kneigh_matrix()
+#' Vadj_kneigh_matrix()
 #'
 #' @export
 #'
 
 
-Moleculors$Vadj_kneigh_matrix = function(n) {
+Vadj_kneigh_matrix = function(n) {
 
   if (is.matrix(Mol_mat$graph_Vdistance_matrix) & n < nrow(Mol_mat$graph_Vdistance_matrix) & n%%1 == 0){
     graph_Vadj_kneigh_matrix = matrix(nrow = nrow(Mol_mat$graph_Vdistance_matrix), ncol = nrow(Mol_mat$graph_Vdistance_matrix))
@@ -1046,23 +979,19 @@ Moleculors$Vadj_kneigh_matrix = function(n) {
 #' return the n power of the adjacency matrix.
 #'
 #'
-#' @name Moleculors$Vadj_highpower_matrix
-#'
-#' @usage Moleculors$Vadj_highpower_matrix()
-#'
 #' @param n integer for matrix power
 #'
 #' @return nth power vertex matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
 #'
 #' @examples
-#' Moleculors$Vadj_highpower_matrix()
+#' Vadj_highpower_matrix()
 #'
 #' @export
 #'
 
 
 
-Moleculors$Vadj_highpower_matrix = function(n){
+Vadj_highpower_matrix = function(n){
 
   if (is.matrix(Mol_mat$graph_Vadj_matrix) & n%%1 == 0){
 
@@ -1089,21 +1018,21 @@ Moleculors$Vadj_highpower_matrix = function(n){
 # This function return the detour vertex matrix, which contain the longest
 # distance between two vertexes.
 
-Moleculors$Detour_Vdistance = function(Vdistance_matrix){
+Detour_Vdistance = function(Vdistance_matrix){
 
 }
 
 # This function return the detour edges matrix, which contain the longest
 # distance between two edges.
 
-Moleculors$Detour_Edistance = function(Edistance_matrix){
+Detour_Edistance = function(Edistance_matrix){
 
 }
 
 # This function return the complement V matrix of the detour matrix as V - dij where V
 # is the number of vertexes
 
-Moleculors$Detour_VCdistance = function(Vdistance_matrix){
+Detour_VCdistance = function(Vdistance_matrix){
 
 }
 
@@ -1111,14 +1040,14 @@ Moleculors$Detour_VCdistance = function(Vdistance_matrix){
 # This function return the complement E matrix of the detour matrix as E - dij where E
 # is the number of edges
 
-Moleculors$Detour_ECdistance = function(Edistance_matrix){
+Detour_ECdistance = function(Edistance_matrix){
 
 }
 
 # This function return the reverse V matrix of the detour matrix as dmax - Vdetourij where dmax
 # is the longest detour distance (max(Vdetour)) for vertexes
 
-Moleculors$RevDetour_Vdistance = function(detour_Vdistance_matrix){
+RevDetour_Vdistance = function(detour_Vdistance_matrix){
 
 }
 
@@ -1126,7 +1055,7 @@ Moleculors$RevDetour_Vdistance = function(detour_Vdistance_matrix){
 # is the longest detour distance (max(Edetour)) for edges
 
 
-Moleculors$RevDetour_Edistance = function(detour_Edistance_matrix){
+RevDetour_Edistance = function(detour_Edistance_matrix){
 
 }
 
@@ -1134,7 +1063,7 @@ Moleculors$RevDetour_Edistance = function(detour_Edistance_matrix){
 # It returns Vdetourij if i < j and Vdistance if if i > j (i = j = 0)
 
 
-Moleculors$Detour_Distance_Vdistance = function(Vdistance_matrix, detour_Vdistance_matrix){
+Detour_Distance_Vdistance = function(Vdistance_matrix, detour_Vdistance_matrix){
 
 }
 
@@ -1143,6 +1072,6 @@ Moleculors$Detour_Distance_Vdistance = function(Vdistance_matrix, detour_Vdistan
 # It returns Edetourij if i < j and Edistance if if i > j (i = j = 0)
 
 
-Moleculors$Detour_Distance_Edistance = function(Edistance_matrix, detour_Edistance_matrix){
+Detour_Distance_Edistance = function(Edistance_matrix, detour_Edistance_matrix){
 
 }

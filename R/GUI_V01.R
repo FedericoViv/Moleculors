@@ -30,7 +30,7 @@ Moleculors_GUI = function(){
   body[1,1] = gbutton(
     "Upload Cartesian Coordinates",
     handler = function(h, ...){
-      text_show_load = capture.output(Moleculors$molecular_input(), type = "message")
+      text_show_load = capture.output(molecular_input(), type = "message")
       body[31:32,1:2] = glabel(text_show_load)
       body[2:30,1:2] = gtable(Mol_mat$input)
     }
@@ -65,7 +65,7 @@ calc_matrix = function(){
   body[1,5] = gbutton(
     "Graphical matrices calculation",
     handler = function(h, ...){
-      text_show_graph = capture.output(Moleculors$graphical_matrix(), type = "message")
+      text_show_graph = capture.output(graphical_matrix(), type = "message")
       tail[2,30] = glabel(text_show_graph)
       picker_list = names(Mol_mat)
       body[2,5:10] = gcombobox(picker_list,
@@ -83,7 +83,7 @@ vis_descriptor = function() {
   body[1,40] = gbutton(
     "Molecular descriptors calculation",
     handler = function(h, ...){
-      text_show_desc = capture.output(Moleculors$descriptor_launcher(), type = "message")
+      text_show_desc = capture.output(descriptor_launcher(), type = "message")
       tail[2,60] = glabel(text_show_desc)
       picker_list = names(Output_descp)
       body[2,40] = gcombobox(picker_list,

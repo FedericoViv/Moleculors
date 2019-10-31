@@ -7,19 +7,15 @@
 #' target molecule! If this requirement is not fullfilled any descriptor
 #' will not be related to the topological property at all.
 #'
-#' @name Moleculors$molecular_input
-#'
-#' @usage Moleculors$molecular_input()
-#'
 #'
 #' @examples
-#' Moleculors$molecular_input()
+#' molecular_input()
 #'
 #' @eval Moleculors
 #'
 #' @export
 
-Moleculors$molecular_input = function(){
+molecular_input = function(){
 
   cartesian_csv = tryCatch({ cartesian_csv = read.csv(file.choose(),
                                                       header = FALSE)

@@ -4,19 +4,16 @@
 #' by checking the atom symbol in the input matrix/df and crossing it
 #' with an internal library containing atoms weight.
 #'
-#' @name Moleculors$molecular_weight
-#'
-#' @usage Moleculors$molecular_weight()
 #'
 #' @return Molecular weight of the selected molecule. Values are store inside Output_descp environment.
 #'
 #' @examples
-#' Moleculors$molecular_weight()
+#' molecular_weight()
 #'
 #' @export
 
 
-Moleculors$molecular_weight = function(){
+molecular_weight = function(){
 
   if (is.data.frame(Mol_mat$input)) {
 
@@ -49,19 +46,15 @@ Moleculors$molecular_weight = function(){
 #' molecular input by simply calculating the number of rows of the input matrix
 #
 #'
-#' @name Moleculors$N_atoms
-#'
-#' @usage Moleculors$N_atoms()
-#'
 #' @return Number of atoms in the selected molecule. Values are store inside Output_descp environment.
 #'
 #' @examples
-#' Moleculors$N_atoms()
+#' N_atoms()
 #'
 #' @export
 
 
-Moleculors$N_atoms = function(){
+N_atoms = function(){
 
   if(is.data.frame(Mol_mat$input)){
 

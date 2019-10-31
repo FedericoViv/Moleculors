@@ -2,7 +2,7 @@
 # Once implemented will be removed from this file
 
 
-Moleculors$Hosoya_index_calc = function(Vadj_Input_matrix, Eadj_Input_matrix){
+Hosoya_index_calc = function(Vadj_Input_matrix, Eadj_Input_matrix){
 
   Z = 1
 
@@ -32,7 +32,7 @@ Moleculors$Hosoya_index_calc = function(Vadj_Input_matrix, Eadj_Input_matrix){
 
 
 
-Moleculors$Szeged_Vdistance = function(Vdistance_matrix){
+Szeged_Vdistance = function(Vdistance_matrix){
 
   graph_Vszeged_matrix = matrix(nrow = nrow(Vdistance_matrix), ncol = nrow(Vdistance_matrix))
   for (i in 1:nrow(Vdistance_matrix)) {
@@ -47,7 +47,7 @@ Moleculors$Szeged_Vdistance = function(Vdistance_matrix){
     }
   }
 
-  Moleculors$graph_Vszeged_matrix = graph_Vszeged_matrix
+  graph_Vszeged_matrix = graph_Vszeged_matrix
 }
 
 
@@ -55,7 +55,7 @@ Moleculors$Szeged_Vdistance = function(Vdistance_matrix){
 # it take as input the Vdistance_matrix and for each element return the
 # number of vertex close to i after removing any vertex in the path i-j
 
-Moleculors$cluj_Vdistance = function(Vdistance_matrix){
+cluj_Vdistance = function(Vdistance_matrix){
 
   graph_Vcluj_matrix = matrix(nrow = nrow(Vdistance_matrix), ncol = nrow(Vdistance_matrix))
   for (i in 1:nrow(Vdistance_matrix)) {
@@ -70,7 +70,7 @@ Moleculors$cluj_Vdistance = function(Vdistance_matrix){
     }
   }
 
-  Moleculors$graph_Vcluj_matrix = graph_Vcluj_matrix
+  graph_Vcluj_matrix = graph_Vcluj_matrix
 }
 
 
@@ -78,7 +78,7 @@ Moleculors$cluj_Vdistance = function(Vdistance_matrix){
 # it take as input the Vdistance_matrix and for each element return the
 # number all the possible path to get from i to j
 
-Moleculors$allpath_Vdistance = function(Vdistance_matrix){
+allpath_Vdistance = function(Vdistance_matrix){
 
   graph_Vallpath_matrix = matrix(nrow = nrow(Vdistance_matrix), ncol = nrow(Vdistance_matrix))
   for (i in 1:nrow(Vdistance_matrix)) {
@@ -93,5 +93,5 @@ Moleculors$allpath_Vdistance = function(Vdistance_matrix){
     }
   }
 
-  Moleculors$graph_Vallpath_matrix = graph_Vallpath_matrix
+  graph_Vallpath_matrix = graph_Vallpath_matrix
 }

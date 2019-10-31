@@ -10,20 +10,16 @@
 #' row of the graphical matrix
 #'
 #'
-#' @name Moleculors$Wiener_index_calc
-#'
-#' @usage Moleculors$Wiener_index_calc()
-#'
 #' @return Weiner index. Value is stored in Ouput_descp environment.
 #'
 #' @examples
-#' Moleculors$Wiener_index_calc()
+#' Wiener_index_calc()
 #'
 #' @export
 #'
 
 
-Moleculors$Wiener_index_calc = function(){
+Wiener_index_calc = function(){
 
   if (is.matrix(Mol_mat$graph_Vdistance_matrix)) {
 
@@ -52,20 +48,16 @@ Moleculors$Wiener_index_calc = function(){
 #' of the adjacency matrix
 #'
 #'
-#' @name Moleculors$Platt_number_calc
-#'
-#' @usage Moleculors$Platt_number_calc()
-#'
 #' @return Platt number. Value is stored in Ouput_descp environment.
 #'
 #' @examples
-#' Moleculors$Platt_number_calc()
+#' Platt_number_calc()
 #'
 #' @export
 #'
 
 
-Moleculors$Platt_number_calc = function(){
+Platt_number_calc = function(){
 
   if (is.matrix(Mol_mat$graph_Eadj_matrix)) {
 
@@ -93,20 +85,16 @@ Moleculors$Platt_number_calc = function(){
 #' of the squared degree for each atom of the matrix
 #'
 #'
-#' @name Moleculors$Zagreb_index_calc
-#'
-#' @usage Moleculors$Zagreb_index_calc()
-#'
 #' @return Zagreb index. Value is stored in Ouput_descp environment.
 #'
 #' @examples
-#' Moleculors$Zagreb_index_calc()
+#' Zagreb_index_calc()
 #'
 #' @export
 #'
 
 
-Moleculors$Zagreb_index_calc = function(){
+Zagreb_index_calc = function(){
 
   if (is.matrix(Mol_mat$graph_Vlaplacian_matrix)) {
     Zagreb = 0
@@ -136,22 +124,16 @@ Moleculors$Zagreb_index_calc = function(){
 #' called cyclomatic number
 #'
 #'
-#' @name Moleculors$Balaban_index_calc
-#'
-#' @usage Moleculors$Balaban_index_calc()
-#'
 #' @return Baladan index. Value is stored in Ouput_descp environment.
 #'
 #' @examples
-#' Moleculors$Balaban_index_calc()
+#' Balaban_index_calc()
 #'
 #' @export
 #'
 
 
-
-
-Moleculors$Balaban_index_calc = function(){
+Balaban_index_calc = function(){
 
   if (is.matrix(Mol_mat$graph_Vdistance_matrix) & is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Eadj_matrix)) {
     u = nrow(Mol_mat$graph_Eadj_matrix) - nrow(Mol_mat$graph_Vadj_matrix) + 1
