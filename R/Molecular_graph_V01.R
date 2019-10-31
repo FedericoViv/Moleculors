@@ -995,11 +995,11 @@ Vadj_highpower_matrix = function(n){
 
   if (is.matrix(Mol_mat$graph_Vadj_matrix) & n%%1 == 0){
 
-    graph_Vadj_highpower_matrix = is.matrix(Mol_mat$graph_Vdistance_matrix)
+    graph_Vadj_highpower_matrix = as.matrix(Mol_mat$graph_Vdistance_matrix)
 
     for (i in 2:n) {
 
-      graph_Vadj_highpower_matrix = graph_Vadj_highpower_matrix %*% is.matrix(Mol_mat$graph_Vdistance_matrix)
+      graph_Vadj_highpower_matrix = graph_Vadj_highpower_matrix %*% as.matrix(Mol_mat$graph_Vdistance_matrix)
     }
 
     Mol_mat$graph_vadj_highpower_matrix = graph_Vadj_highpower_matrix
