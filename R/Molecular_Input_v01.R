@@ -1,11 +1,22 @@
-##Moleculors general
-
-# This function take a csv file containing 4 colums:
-# atom symbol, X,Y,Z. Any difference will be detected as
-# an error or warning depending on the situation.
-#
-#
-#
+#' Moleculors input file loader.
+#'
+#' This function take a csv file containing 4 colums:
+#' atom symbol, X,Y,Z. Any difference will be detected as
+#' an error or warning depending on the situation. NOTE: the input
+#' coordinates are supposed to be the optimized coordinates of the
+#' target molecule! If this requirement is not fullfilled any descriptor
+#' will not be related to the topological property at all.
+#'
+#' @name Moleculors$molecular_input
+#'
+#' @usage Moleculors$molecular_input()
+#'
+#' @return dataframe named Input inside Mol_mat environment to be used for matrices and descriptors calculation
+#'
+#' @examples
+#' Moleculors$molecular_input()
+#'
+#' @export
 
 Moleculors$molecular_input = function(){
 

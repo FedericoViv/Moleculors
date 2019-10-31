@@ -14,7 +14,7 @@ Moleculors$Hosoya_index_calc = function(Vadj_Input_matrix, Eadj_Input_matrix){
 
     } else {
 
-      Z = Z +
+      Z = Z
 
     }
   }

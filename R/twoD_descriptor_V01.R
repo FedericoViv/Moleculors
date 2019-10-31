@@ -1,13 +1,27 @@
 ## This file contain the two dimentional molecular descriptor
 # Each function take as input a graphical matrix calculated in the Molecular_graph source file.
-# Each molecular descriptor will be saved the Moleculors environment for future call
+# Each molecular descriptor will be saved in the Output_descp environment for future call
 
 
+#' Moleculors Weiner index calculator
+#'
+#' This function take as input the vertex distance graphical matrix and return the Wiener Index
+#' this index is calculated as half of the summatory of the summatory of the distances in each
+#' row of the graphical matrix
+#'
+#'
+#' @name Moleculors$Wiener_index_calc
+#'
+#' @usage Moleculors$Wiener_index_calc()
+#'
+#' @return Weiner index. Value is stored in Ouput_descp environment.
+#'
+#' @examples
+#' Moleculors$Wiener_index_calc()
+#'
+#' @export
+#'
 
-
-# This function take as input the vertex distance graphical matrix and return the Wiener Index
-# this index is calculated as half of the summatory of the summatory of the distances in each
-# row of the graphical matrix
 
 Moleculors$Wiener_index_calc = function(){
 
@@ -31,9 +45,25 @@ Moleculors$Wiener_index_calc = function(){
 }
 
 
-# This function take as input the edge adjacency matrix and return the Platt Number
-# this number is calculated as the summatory of the summatory of each elementij in each row
-# of the adjacency matrix
+#' Moleculors Platt number calculator
+#'
+#' This function take as input the edge adjacency matrix and return the Platt Number
+#' this number is calculated as the summatory of the summatory of each elementij in each row
+#' of the adjacency matrix
+#'
+#'
+#' @name Moleculors$Platt_number_calc
+#'
+#' @usage Moleculors$Platt_number_calc()
+#'
+#' @return Platt number. Value is stored in Ouput_descp environment.
+#'
+#' @examples
+#' Moleculors$Platt_number_calc()
+#'
+#' @export
+#'
+
 
 Moleculors$Platt_number_calc = function(){
 
@@ -56,11 +86,25 @@ Moleculors$Platt_number_calc = function(){
   }
 }
 
+#' Moleculors Zagreb index calculator
+#'
+#' This function take as input the Laplacian Vertex matrix and return
+#' the Zagreb index for the selected molecular graph as the summatory
+#' of the squared degree for each atom of the matrix
+#'
+#'
+#' @name Moleculors$Zagreb_index_calc
+#'
+#' @usage Moleculors$Zagreb_index_calc()
+#'
+#' @return Zagreb index. Value is stored in Ouput_descp environment.
+#'
+#' @examples
+#' Moleculors$Zagreb_index_calc()
+#'
+#' @export
+#'
 
-
-# This function take as input the Laplacian Vertex matrix and return
-# the Zagreb index for the selected molecular graph as the summatory
-# of the squared degree for each atom of the matrix
 
 Moleculors$Zagreb_index_calc = function(){
 
@@ -83,13 +127,28 @@ Moleculors$Zagreb_index_calc = function(){
   }
 }
 
+#' Moleculors Balaban index calculator
+#'
+#' This function take as input the Vertex adjacency matrix, the Vertex
+#' distance matrix,the Edge adjacency matrix and compute the
+#' Balaban index as Edges/ 'Edges - Vertex + 1' x summatory 'total_distancei * total_distancej'^-0.5
+#' for any adjacence vertex. The number 'Edges - Vertex + 1' is denominated with u and is
+#' called cyclomatic number
+#'
+#'
+#' @name Moleculors$Balaban_index_calc
+#'
+#' @usage Moleculors$Balaban_index_calc()
+#'
+#' @return Baladan index. Value is stored in Ouput_descp environment.
+#'
+#' @examples
+#' Moleculors$Balaban_index_calc()
+#'
+#' @export
+#'
 
 
-# This function take as input the Vertex adjacency matrix, the Vertex
-# distance matrix,the Edge adjacency matrix and compute the
-# Balaban index as Edges/ (Edges - Vertex + 1) * summatory (total_distancei * total_distancej)^-0.5
-# for any adjacence vertex. The number (Edges -Vertex + 1) is denominated with u and is
-# called cyclomatic number
 
 
 Moleculors$Balaban_index_calc = function(){

@@ -1,7 +1,19 @@
-# This source file contain the Molecular descriptor functions caller and handler
-# If this package is intended to be used in its basic application the user is suggested
-# to start directly the function in this file to compute every available descriptor simultaneously
-
+#' Moleculors descriptor calculator launcher
+#'
+#' This function runs the Molecular descriptors functions and handle each of
+#' them automatically. The user is suggested to start this function rather than each one
+#' of the manually if all the descriptors are required.
+#'
+#' @name Moleculors$descriptor_launcher
+#'
+#' @usage Moleculors$descriptor_launcher()
+#'
+#' @return Returns the molecular descriptors '0D, 1D, 2D' for the selected molecule. Results are stored in Output_descp environment.
+#'
+#' @examples
+#' Moleculors$descriptor_launcher()
+#'
+#' @export
 
 Moleculors$descriptor_launcher = function(){
 

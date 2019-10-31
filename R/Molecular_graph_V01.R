@@ -4,20 +4,29 @@
 # if any of the computation failed. Each matrix is then stored in the Moleculors environment
 # for future use.
 
-
-
-
-
-# This function take the cartesian coordinates of a molecule and return the graphical matrices
-# of its structure. To do this first of all remove all the hydrogens leaving only the carbons
-# and heteroatoms. Then it compute the relative distance for each atom from each other and
-# round it up. In the end we will have a matrix n*n where n is the number of atoms
-# and each cell contain an integer pointing to the number of bonds intercurring
-# between the diagonal element and the others. The adjacency matrix is then computed by checking if
-# the distance is 1 or not.
-# For the edge matrix, the edge coordinate is computed from the input coordinates as the mid point
-# between two adjacent atoms and then the distance and adjacency is computed using the previuos
-# algorithm
+#' Moleculors graphical matrices calculator
+#'
+#' This function take the cartesian coordinates of a molecule and return the graphical matrices
+#' of its structure. To do this first of all remove all the hydrogens leaving only the carbons
+#' and heteroatoms. Then it compute the relative distance for each atom from each other and
+#' round it up. In the end we will have a matrix n*n where n is the number of atoms
+#' and each cell contain an integer pointing to the number of bonds intercurring
+#' between the diagonal element and the others. The adjacency matrix is then computed by checking if
+#' the distance is 1 or not.
+#' For the edge matrix, the edge coordinate is computed from the input coordinates as the mid point
+#' between two adjacent atoms and then the distance and adjacency is computed using the previuos
+#' algorithm
+#'
+#' @name Moleculors$graphical_matrix
+#'
+#' @usage Moleculors$graphical_matrix()
+#'
+#' @return Graphical matrices for edges and verteces stored inside the Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$graphical_matrix()
+#'
+#' @export
 
 
 Moleculors$graphical_matrix = function(){
@@ -96,17 +105,29 @@ Moleculors$graphical_matrix = function(){
 }
 
 
-
-# This function calculate the V adjacency matrix using as Input the Hydrogen suppressed
-# cartesian matrix. In order to compute the distances it starts by calculating the
-# magnitude of the vector from each atom to one another. Then after rounding (too many digits
-# may lead to bad calculation in the following steps) it choose the smallest value (different
-# from 0) has the 1 distance value. A loop is used to assure that every value of lenght 1 has
-# the same value for the normalization step following later.
-# a normalization is the computed and  every other value different from 1 is set to 0
-#
-#
-#
+#' Moleculors vertex adjacency matrix
+#'
+#' This function calculate the V adjacency matrix using as Input the Hydrogen suppressed
+#' cartesian matrix. In order to compute the distances it starts by calculating the
+#' magnitude of the vector from each atom to one another. Then after rounding 'too many digits
+#' may lead to bad calculation in the following steps' it choose the smallest value 'different
+#' from 0' has the 1 distance value. A loop is used to assure that every value of lenght 1 has
+#' the same value for the normalization step following later.
+#' a normalization is the computed and  every other value different from 1 is set to 0
+#'
+#' @name Moleculors$Vadj_matrix
+#'
+#' @usage Moleculors$Vadj_matrix()
+#'
+#' @param Cart_Input_Hsupp Cartesian coordinates of the molecule without the hydrogen atoms
+#'
+#' @return Vertex adjacency matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$Vadj_matrix(input_H_suppressed)
+#'
+#' @export
+#'
 
 Moleculors$Vadj_matrix = function(Cart_Input_Hsupp){
 
@@ -149,14 +170,28 @@ Moleculors$Vadj_matrix = function(Cart_Input_Hsupp){
   message("Vertex adjacency matrix ... OK")
 }
 
+#' Moleculors vertex distance matrix
+#'
+#' This function take the adjacency matrix as input and generate a connection list where the index
+#' is related to the atom and the value in the index list are the atoms to which that atom is connected
+#' For each element with d != 1 is then calculated the distance by taking the value in the connection list
+#' copying those into the connection vector and if the interested atom j is not in the connection vector
+#' a new vector is created with all the connection of the atom to which the first atoms was connected
+#' this is looped increasing distance at each failed loop to detect the interested element.
+#'
+#' @name Moleculors$Vdistance_matrix
+#'
+#' @usage Moleculors$Vdistance_matrix()
+#'
+#' @return Vertex distance matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$Vdistance_matrix()
+#'
+#' @export
+#'
 
 
-# This function take the adjacency matrix as input and generate a connection list where the index
-# is related to the atom and the value in the index list are the atoms to which that atom is connected
-# For each element with d != 1 is then calculated the distance by taking the value in the connection list
-# copying those into the connection vector and if the interested atom (j) is not in the connection vector
-# a new vector is created with all the connection of the atom to which the first atoms was connected
-# this is looped increasing distance at each failed loop to detect the interested element.
 
 Moleculors$Vdistance_matrix = function(){
 
@@ -201,10 +236,25 @@ Moleculors$Vdistance_matrix = function(){
   }
 }
 
-# This function requires the Vdistance_matrix in order to compute the complement
-# of the distance matrix. Each element is set has nrow(Vdistance) - Vdistanceij
-#
-#
+
+#' Moleculors vertex distance matrix
+#'
+#' This function requires the Vdistance_matrix in order to compute the complement
+#'  of the distance matrix. Each element is set has nrowVdistance - Vdistanceij
+#'
+#' @name Moleculors$VCdistance_matrix
+#'
+#' @usage Moleculors$VCdistance_matrix()
+#'
+#' @return Vertex complement distance matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$VCdistance_matrix()
+#'
+#' @export
+#'
+
+
 
 Moleculors$VCdistance_matrix = function(){
 
@@ -228,12 +278,25 @@ Moleculors$VCdistance_matrix = function(){
   }
 }
 
-
-# This function require the H suppressed cartesian matrix
-# and the adjagency matrix for the vertexes in order to compute
-# the edge cartesian matrix and the adjacency edges matrices.
-#
-#
+#' Moleculors edge adjacency matrix
+#'
+#' This function require the H suppressed cartesian matrix
+#' and the adjagency matrix for the vertexes in order to compute
+#' the edge cartesian matrix and the adjacency edges matrices.
+#'
+#' @name Moleculors$Eadj_matrix
+#'
+#' @usage Moleculors$Eadj_matrix()
+#'
+#' @param Cart_Input_Hsupp Cartesian coordinates of the molecule without the hydrogen atoms
+#'
+#' @return Edge adjacency matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$Eadj_matrix(input_H_suppressed)
+#'
+#' @export
+#'
 
 
 Moleculors$Eadj_matrix = function(Cart_Input_Hsupp){
@@ -309,11 +372,26 @@ Moleculors$Eadj_matrix = function(Cart_Input_Hsupp){
 
 }
 
-# This function takes as input the Eadjancency matrix and compute, using
-# the same algorithm used for the vertexes, the distance matrix for the edges.
-# This is done by computing a connection vector that states with which edge each edge is connected
-# than it loop through each connection to find the wanted connection (e.g. elemij It loop through
-# the connection of 1 until it find the element j, increasing the distance at each loop)
+#' Moleculors edge distance matrix
+#'
+#' This function takes as input the Eadjancency matrix and compute, using
+#' the same algorithm used for the vertexes, the distance matrix for the edges.
+#' This is done by computing a connection vector that states with which edge each edge is connected
+#' than it loop through each connection to find the wanted connection 'e.g. elemij It loop through
+#' the connection of 1 until it find the element j, increasing the distance at each loop'
+#'
+#' @name Moleculors$Edistance_matrix
+#'
+#' @usage Moleculors$Edistance_matrix()
+#'
+#' @return Edge distance matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$Edistance_matrix()
+#'
+#' @export
+#'
+
 
 Moleculors$Edistance_matrix = function(){
 
@@ -358,10 +436,23 @@ Moleculors$Edistance_matrix = function(){
   }
 }
 
+#' Moleculors edge complement distance matrix
+#'
+#' This function takes as input the Edistance matrix and compute for each element
+#' the complement as nrowEdistance_matrix - Edistance_matrixi,j
+#'
+#' @name Moleculors$ECdistance_matrix
+#'
+#' @usage Moleculors$ECdistance_matrix()
+#'
+#' @return Edge complement distance matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$ECdistance_matrix()
+#'
+#' @export
+#'
 
-
-# This function takes as input the Edistance matrix and compute for each element
-# the complement as nrow(Edistance_matrix) - Edistance_matrix[i,j]
 
 Moleculors$ECdistance_matrix = function(){
 
@@ -386,11 +477,25 @@ Moleculors$ECdistance_matrix = function(){
 }
 
 
-# This function compute the vertex version of the so called
-# Harary matrix. It take has input the Vdistance_matrix and for each
-# element of the matrix if i != j it returns the reciprocal value of
-# the distance matrix
-#
+#' Moleculors vertex harary matrix
+#'
+#' This function compute the vertex version of the so called
+#' Harary matrix. It take has input the Vdistance_matrix and for each
+#' element of the matrix if i != j it returns the reciprocal value of
+#' the distance matrix
+#'
+#' @name Moleculors$V_Harary_matrix
+#'
+#' @usage Moleculors$V_Harary_matrix()
+#'
+#' @return Vertex Harary matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$V_Harary_matrix()
+#'
+#' @export
+#'
+
 
 Moleculors$V_Harary_matrix = function(){
 
@@ -414,11 +519,26 @@ Moleculors$V_Harary_matrix = function(){
   }
 }
 
-# This function compute the edge version of the so called
-# Harary matrix. It take has input the Edistance_matrix and for each
-# element of the matrix if i != j it returns the reciprocal value of
-# the distance matrix
-#
+
+#' Moleculors edge harary matrix
+#'
+#' This function compute the edge version of the so called
+#' Harary matrix. It take has input the Edistance_matrix and for each
+#' element of the matrix if i != j it returns the reciprocal value of
+#' the distance matrix
+#'
+#' @name Moleculors$E_Harary_matrix
+#'
+#' @usage Moleculors$E_Harary_matrix()
+#'
+#' @return Edge Harary matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$E_Harary_matrix()
+#'
+#' @export
+#'
+
 
 Moleculors$E_Harary_matrix = function(){
 
@@ -442,11 +562,26 @@ Moleculors$E_Harary_matrix = function(){
   }
 }
 
-# This function compute the vertex version of the reciprocal
-# complement vertex matrix . It take has input the VCdistance_matrix and for each
-# element of the matrix if i != j it returns the reciprocal value of
-# the distance matrix
-#
+
+#' Moleculors vertex reciprocal complement matrix
+#'
+#' This function compute the vertex version of the reciprocal
+#' complement vertex matrix . It take has input the VCdistance_matrix and for each
+#' element of the matrix if i != j it returns the reciprocal value of
+#' the distance matrix
+#'
+#' @name Moleculors$Rec_VCdistance
+#'
+#' @usage Moleculors$Rec_VCdistance()
+#'
+#' @return Vertex reciprocal complement matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$Rec_VCdistance()
+#'
+#' @export
+#'
+
 
 Moleculors$Rec_VCdistance = function(){
 
@@ -471,13 +606,25 @@ Moleculors$Rec_VCdistance = function(){
 }
 
 
+#' Moleculors edge reciprocal complement matrix
+#'
+#' This function compute the vertex version of the reciprocal
+#' complement vertex matrix . It take has input the VCdistance_matrix and for each
+#' element of the matrix if i != j it returns the reciprocal value of
+#' the distance matrix
+#'
+#' @name Moleculors$Rec_ECdistance
+#'
+#' @usage Moleculors$Rec_ECdistance()
+#'
+#' @return Edge reciprocal complement matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$Rec_ECdistance()
+#'
+#' @export
+#'
 
-
-# This function compute the edge version of the reciprocal
-# complement edge matrix . It take has input the ECdistance_matrix and for each
-# element of the matrix if i != j it returns the reciprocal value of
-# the edge distance matrix
-#
 
 Moleculors$Rec_ECdistance = function(){
 
@@ -502,13 +649,27 @@ Moleculors$Rec_ECdistance = function(){
 }
 
 
-# This function compute the vertex version of the complementary
-# vertex matrix . It take has input the Vdistance_matrix and for each
-# element of the matrix if i != j it returns the  value of dmin + dmax - elemij
-# were dmin is the minimal lenght in the molecular graph (1 for simple molecules)
-# dmax is the maximum lenght in the system and elemij is the value of the element i j
-# of the vertex distance matrix
-#
+#' Moleculors vertex complementary matrix
+#'
+#' This function compute the vertex version of the complementary
+#' vertex matrix . It take has input the Vdistance_matrix and for each
+#' element of the matrix if i != j it returns the  value of dmin + dmax - elemij
+#' were dmin is the minimal lenght in the molecular graph (1 for simple molecules)
+#' dmax is the maximum lenght in the system and elemij is the value of the element i j
+#' of the vertex distance matrix
+#'
+#'
+#' @name Moleculors$Complementary_Vdistance
+#'
+#' @usage Moleculors$Complementary_Vdistance()
+#'
+#' @return Vertex reciprocal matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$Complementary_Vdistance()
+#'
+#' @export
+#'
 
 
 Moleculors$Complementary_Vdistance = function(){
@@ -533,14 +694,27 @@ Moleculors$Complementary_Vdistance = function(){
   }
 }
 
-
-# This function compute the edge version of the complementary
-# edge matrix . It take has input the Edistance_matrix and for each
-# element of the matrix if i != j it returns the  value of dmin + dmax - elemij
-# were dmin is the minimal lenght in the molecular graph (1 for simple molecules)
-# dmax is the maximum lenght in the system and elemij is the value of the element i j
-# of the edge distance matrix
-#
+#' Moleculors edge complementary matrix
+#'
+#' This function compute the edge version of the complementary
+#' edge matrix . It take has input the Edistance_matrix and for each
+#' element of the matrix if i != j it returns the  value of dmin + dmax - elemij
+#' were dmin is the minimal lenght in the molecular graph (1 for simple molecules)
+#' dmax is the maximum lenght in the system and elemij is the value of the element i j
+#' of the edge distance matrix
+#'
+#'
+#' @name Moleculors$Complementary_Edistance
+#'
+#' @usage Moleculors$Complementary_Edistance()
+#'
+#' @return Edge complementary matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$Complementary_Edistance()
+#'
+#' @export
+#'
 
 
 Moleculors$Complementary_Edistance = function(){
@@ -564,11 +738,26 @@ Moleculors$Complementary_Edistance = function(){
   }
 }
 
-# This function compute the vertex version of the reciprocal
-# complementary vertex matrix . It take has input the Complementary_Vdistance_matrix and for each
-# element of the matrix if i != j it returns the reciprocal value of
-# the distance matrix
-#
+#' Moleculors vertex reciprocal complementary matrix
+#'
+#' This function compute the vertex version of the reciprocal
+#' complementary vertex matrix . It take has input the Complementary_Vdistance_matrix and for each
+#' element of the matrix if i != j it returns the reciprocal value of
+#' the distance matrix
+#'
+#'
+#' @name Moleculors$Rec_Complementary_Vdistance
+#'
+#' @usage Moleculors$Rec_Complementary_Vdistance()
+#'
+#' @return Vertex reciprocal complementary matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$Rec_Complementary_Vdistance()
+#'
+#' @export
+#'
+
 
 Moleculors$Rec_Complementary_Vdistance = function(){
 
@@ -591,11 +780,26 @@ Moleculors$Rec_Complementary_Vdistance = function(){
   }
 }
 
-# This function compute the edge version of the reciprocal
-# complementary edge matrix . It take has input the Complementary_Edistance_matrix and for each
-# element of the matrix if i != j it returns the reciprocal value of
-# the distance matrix
-#
+#' Moleculors edge reciprocal complementary matrix
+#'
+#' This function compute the edge version of the reciprocal
+#' complementary edge matrix . It take has input the Complementary_Edistance_matrix and for each
+#' element of the matrix if i != j it returns the reciprocal value of
+#' the distance matrix
+#'
+#'
+#' @name Moleculors$Rec_Complementary_Edistance
+#'
+#' @usage Moleculors$Rec_Complementary_Edistance()
+#'
+#' @return Edge reciprocal complementary matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$Rec_Complementary_Edistance()
+#'
+#' @export
+#'
+
 
 Moleculors$Rec_Complementary_Edistance = function(){
 
@@ -618,11 +822,26 @@ Moleculors$Rec_Complementary_Edistance = function(){
   }
 }
 
-# This function compute the vertex version of the distance-path-matrix
-# It take has input the Vdistance_matrix and for each
-# element of the matrix if i != j it returns elemij*(elemij + 1)/2 value of
-# the distance matrix
-#
+#' Moleculors vertex distance path matrix
+#'
+#' This function compute the vertex version of the distance-path-matrix
+#' It take has input the Vdistance_matrix and for each
+#' element of the matrix if i != j it returns elemij*'elemij + 1'/2 value of
+#' the distance matrix
+#'
+#'
+#' @name Moleculors$Distance_path_Vdistance
+#'
+#' @usage Moleculors$Distance_path_Vdistance()
+#'
+#' @return Vertex distance path matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$Distance_path_Vdistance()
+#'
+#' @export
+#'
+
 
 Moleculors$Distance_path_Vdistance = function(){
 
@@ -645,11 +864,26 @@ Moleculors$Distance_path_Vdistance = function(){
   }
 }
 
-# This function compute the edge version of the distance-path-matrix
-# It take has input the Edistance_matrix and for each
-# element of the matrix if i != j it returns elemij*(elemij + 1)/2 value of
-# the distance matrix
-#
+#' Moleculors edge distance path matrix
+#'
+#' This function compute the edge version of the distance-path-matrix
+#' It take has input the Edistance_matrix and for each
+#' element of the matrix if i != j it returns elemij*'elemij + 1'/2 value of
+#' the distance matrix
+#'
+#'
+#' @name Moleculors$Distance_path_Edistance
+#'
+#' @usage Moleculors$Distance_path_Edistance()
+#'
+#' @return Edge distance path matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$Distance_path_Edistance()
+#'
+#' @export
+#'
+
 
 Moleculors$Distance_path_Edistance = function(){
 
@@ -672,12 +906,25 @@ Moleculors$Distance_path_Edistance = function(){
   }
 }
 
-
-# This function return the laplacian matrix for the vertex distance matrix
-# it take as input the Vdistance_matrix and for each element return
-# -1 if elemij = 1, sum(elemi, == 1) if i = j (which is the angle of the vertex)
-# and 0 for every other element
-
+#' Moleculors vertex Laplacian matrix
+#'
+#' This function return the laplacian matrix for the vertex distance matrix
+#' it take as input the Vdistance_matrix and for each element return
+#' -1 if elemij = 1, sum'elemi, == 1' if i = j 'which is the angle of the vertex'
+#' and 0 for every other element
+#'
+#'
+#' @name Moleculors$Laplacian_Vdistance
+#'
+#' @usage Moleculors$Laplacian_Vdistance()
+#'
+#' @return Laplacian vertex matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$Laplacian_Vdistance()
+#'
+#' @export
+#'
 
 
 Moleculors$Laplacian_Vdistance = function(){
@@ -703,12 +950,25 @@ Moleculors$Laplacian_Vdistance = function(){
   }
 }
 
-
-# This function return the laplacian matrix for the edge distance matrix
-# it take as input the Edistance_matrix and for each element return
-# -1 if elemij = 1, sum(elemi, == 1) if i = j (which is the angle of the edge)
-# and 0 for every other element
-
+#' Moleculors edge Laplacian matrix
+#'
+#' This function return the laplacian matrix for the edge distance matrix
+#' it take as input the Edistance_matrix and for each element return
+#' -1 if elemij = 1, sum'elemi, == 1' if i = j 'which is the angle of the edge'
+#' and 0 for every other element
+#'
+#'
+#' @name Moleculors$Laplacian_Edistance
+#'
+#' @usage Moleculors$Laplacian_Edistance()
+#'
+#' @return Laplacian edge matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$Laplacian_Edistance()
+#'
+#' @export
+#'
 
 
 Moleculors$Laplacian_Edistance = function(){
@@ -734,8 +994,26 @@ Moleculors$Laplacian_Edistance = function(){
   }
 }
 
-# This function take as input the Vdistance matrix and an interger < then
-# nrow(vdistance) and return the adjmatrix for the k(n) neighbour
+#' Moleculors vertex kneighbour matrix
+#'
+#' This function take as input the Vdistance matrix and an interger < then
+#' nrow'vdistance' and return the adjmatrix for the kn neighbour
+#'
+#'
+#' @name Moleculors$Vadj_kneigh_matrix
+#'
+#' @usage Moleculors$Vadj_kneigh_matrix()
+#'
+#' @param n integer for kn neighbour
+#'
+#' @return K neighbour vertex matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$Vadj_kneigh_matrix()
+#'
+#' @export
+#'
+
 
 Moleculors$Vadj_kneigh_matrix = function(n) {
 
@@ -762,9 +1040,27 @@ Moleculors$Vadj_kneigh_matrix = function(n) {
   }
 }
 
+#' Moleculors vertex highpower matrix
+#'
+#' This function takes as input the adjacency matrix and an integer n and
+#' return the n power of the adjacency matrix.
+#'
+#'
+#' @name Moleculors$Vadj_highpower_matrix
+#'
+#' @usage Moleculors$Vadj_highpower_matrix()
+#'
+#' @param n integer for matrix power
+#'
+#' @return nth power vertex matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Moleculors$Vadj_highpower_matrix()
+#'
+#' @export
+#'
 
-# This function takes as input the adjacency matrix and an integer n and
-# return the n power of the adjacency matrix.
+
 
 Moleculors$Vadj_highpower_matrix = function(n){
 
