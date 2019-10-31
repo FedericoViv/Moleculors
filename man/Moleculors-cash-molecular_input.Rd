@@ -6,9 +6,6 @@
 \usage{
 Moleculors$molecular_input()
 }
-\value{
-dataframe named Input inside Mol_mat environment to be used for matrices and descriptors calculation
-}
 \description{
 This function take a csv file containing 4 colums:
 atom symbol, X,Y,Z. Any difference will be detected as

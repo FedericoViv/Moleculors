@@ -1,23 +1,5 @@
 #' include Molecular_Input_v01.R Molecular_graph_V01.R GUI_V01.R zeroD_descriptor_V01.R twoD_descriptor_V01.R descriptor_launcher_V01.R
 
-#' Moleculors environment
-#' @export
-#'
-
-Moleculors
-
-#' Matrices environment
-#' @export
-#'
-Mol_mat = new.env()
-
-#' Descriptors environment
-#' @export
-#'
-Output_descp = new.env()
-
-
-
 #' Moleculors initialization and environments set.
 #'
 #' Every functions will be part and only part

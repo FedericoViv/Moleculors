@@ -11,10 +11,11 @@
 #'
 #' @usage Moleculors$molecular_input()
 #'
-#' @return dataframe named Input inside Mol_mat environment to be used for matrices and descriptors calculation
 #'
 #' @examples
 #' Moleculors$molecular_input()
+#'
+#' @eval Moleculors
 #'
 #' @export
 

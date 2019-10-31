@@ -2,7 +2,8 @@
 % Please edit documentation in R/Moleculors_V01.R
 \name{Moleculors_init}
 \alias{Moleculors_init}
-\title{Moleculors initialization and environments set.}
+\title{include Molecular_Input_v01.R Molecular_graph_V01.R GUI_V01.R zeroD_descriptor_V01.R twoD_descriptor_V01.R descriptor_launcher_V01.R
+Moleculors initialization and environments set.}
 \usage{
 Moleculors_init(GUI = TRUE)
 }
