@@ -11,7 +11,6 @@
 #' @examples
 #' molecular_input()
 #'
-#' @eval Moleculors
 #'
 #' @export
 

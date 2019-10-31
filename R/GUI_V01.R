@@ -2,13 +2,19 @@
 # This code is not intended to be modified by the user.
 
 
-# library loading
-
-library(gWidgets2)
-library(gWidgets2RGtk2)
-
-
-# Gui initialization with loader and calculators.
+#' Moleculors GUI
+#'
+#' Basic GUI for moleculors functions User is not supposed to use this functions. GUI should be loaded using Moleculors_init
+#'
+#' @import gWidgets2
+#' @import gWidgets2RGtk2
+#'
+#' @return Graphical user interface for Moleculors functions
+#'
+#' @examples
+#' Moleculors_GUI()
+#'
+#' @export
 
 Moleculors_GUI = function(){
 
