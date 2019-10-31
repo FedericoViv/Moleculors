@@ -4,7 +4,7 @@
 #' @export
 #'
 
-Moleculors <- new.env()
+Moleculors
 
 #' Matrices environment
 #' @export
