@@ -217,7 +217,7 @@ Randic_index_calc <- function(){
 
 Randic_valence_index_calc <- function(){
   if (is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Vadj_matrix_full) &
-      is.data.frame(Mol_mat$input) & is.data.frame(input_H_suppressed)) {
+      is.data.frame(Mol_mat$input) & is.data.frame(Mol_mat$input_H_suppressed)) {
     Randic_valence = 0
     d = c()
     Zval = c()
@@ -232,8 +232,8 @@ Randic_valence_index_calc <- function(){
     H = H[- which(is.na(H))]
 
     for (v in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
-      Ztot[v] <- valence_electrons$Total_electrons[which(valence_electrons$Symbol == as.character(input_H_suppressed$Atom[[v]]))] # total electrons
-      Zval[v] <- valence_electrons$valence_electrons[which(valence_electrons$Symbol == as.character(input_H_suppressed$Atom[[v]]))] ##valence electrons
+      Ztot[v] <- valence_electrons$Total_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))] # total electrons
+      Zval[v] <- valence_electrons$valence_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))] ##valence electrons
       }
 
 

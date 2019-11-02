@@ -41,13 +41,13 @@ graphical_matrix = function(){
       }
       if (i == nrow(Mol_mat$input)) {
 
-        input_H_suppressed = Mol_mat$input[-hydrogen_vector,]
+        Mol_mat$input_H_suppressed = Mol_mat$input[-hydrogen_vector,]
 
       }
     }
 
 
-    Vadj_matrix(input_H_suppressed)
+    Vadj_matrix(Mol_mat$input_H_suppressed)
 
     Vadj_matrix_full(Mol_mat$input)
 
@@ -55,7 +55,7 @@ graphical_matrix = function(){
 
     VCdistance_matrix()
 
-    Eadj_matrix(input_H_suppressed)
+    Eadj_matrix(Mol_mat$input_H_suppressed)
 
     Edistance_matrix()
 
