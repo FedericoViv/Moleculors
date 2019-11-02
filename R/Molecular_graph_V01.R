@@ -49,6 +49,8 @@ graphical_matrix = function(){
 
     Vadj_matrix(input_H_suppressed)
 
+    Vadj_matrix_full(Mol_mat$input)
+
     Vdistance_matrix()
 
     VCdistance_matrix()
@@ -1009,6 +1011,70 @@ Vadj_highpower_matrix = function(n){
   } else {
     message("no adj highpower matrix was computed")
   }
+}
+
+
+
+#' Moleculors vertex adjacency matrix for the whole input
+#'
+#' This function calculate the V adjacency matrix using as Input
+#' cartesian matrix. In order to compute the distances it starts by calculating the
+#' magnitude of the vector from each atom to one another. Then after rounding 'too many digits
+#' may lead to bad calculation in the following steps' it choose the smallest value 'different
+#' from 0' has the 1 distance value. A loop is used to assure that every value of lenght 1 has
+#' the same value for the normalization step following later.
+#' a normalization is the computed and  every other value different from 1 is set to 0
+#'
+#'
+#' @param full_input Cartesian coordinates of the molecule
+#'
+#' @return Vertex adjacency matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Vadj_matrix(Mol_mat$Input)
+#'
+#' @export
+#'
+
+Vadj_matrix_full = function(full_input){
+
+  graph_Vadj_matrix_full = matrix(nrow = nrow(full_input), ncol = nrow(full_input))
+
+  for (i in 1:nrow(graph_Vadj_matrix_full)) {
+
+    for (j in 1:ncol(graph_Vadj_matrix_full)) {
+
+      graph_Vadj_matrix_full[i,j] = sqrt((full_input$X[j] - full_input$X[i])^2 +
+                                      (full_input$Y[j] - full_input$Y[i])^2 +
+                                      (full_input$Z[j] - full_input$Z[i])^2)
+
+    }
+  }
+
+  graph_Vadj_matrix_full = apply(graph_Vadj_matrix_full, 2, round, 2)
+
+
+  for (i in 1:nrow(graph_Vadj_matrix_full)) {
+    for (j in 1:nrow(graph_Vadj_matrix_full)) {
+      if ((graph_Vadj_matrix_full[i,j] - min(graph_Vadj_matrix_full[1,-1])) <= 0.5 & i != j) {
+        graph_Vadj_matrix_full[i,j] = min(graph_Vadj_matrix_full[1,-1])
+      }
+    }
+  }
+
+  graph_Vadj_matrix_full = apply(graph_Vadj_matrix_full, 2, `/`, min(graph_Vadj_matrix_full[1,-1]))
+
+  for (i in 1:nrow(graph_Vadj_matrix_full)) {
+    for (j in 1:nrow(graph_Vadj_matrix_full)) {
+      if (graph_Vadj_matrix_full[i,j] != 1) {
+        graph_Vadj_matrix_full[i,j] = 0
+      }
+    }
+  }
+
+  Mol_mat$graph_Vadj_matrix_full = graph_Vadj_matrix_full
+
+  message("Vertex full adjacency matrix ... OK")
 }
 
 

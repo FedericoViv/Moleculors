@@ -158,5 +158,102 @@ Balaban_index_calc = function(){
   }
 }
 
+#' Moleculors Randic connectivity index calculator
+#'
+#' This function takes the Vertex adjacency matrix and the laplacian matrix
+#' and return the randic connectivity index calculated as the summatory of the product
+#' of the element ij of the adjacency matrix and the inverse of square root
+#' of the product of the degree of the vertexes i j. NOTE this index can be considered
+#' as the Kier and Hall index of the first order.
+#'
+#'
+#' @return Randic connectivity index. Value is stored in Ouput_descp environment.
+#'
+#' @examples
+#' Randix_index_calc()
+#'
+#' @export
+#'
 
+
+Randic_index_calc <- function(){
+  if (is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Vlaplacian_matrix)) {
+    Randic = 0
+
+    for (i in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
+      for (j in 1:ncol(Mol_mat$graph_Vadj_matrix)) {
+        if (j > i) {
+          Randic = Randic + Mol_mat$graph_Vadj_matrix[i,j]*(1/sqrt((Mol_mat$graph_Vlaplacian_matrix[i,i]*Mol_mat$graph_Vlaplacian_matrix[j,j])))
+        }
+      }
+    }
+
+    Output_descp$Randic_index = Randic
+
+    message("Randic connectivity index ... OK")
+  } else {
+    message("Randic connectivity index ... FAIL")
+  }
+}
+
+
+#' Moleculors Randic valence connectivity index calculator
+#'
+#' This function takes the Vertex adjacency matrix, the full adjacency matrix, the raw input and the input with H suppressed
+#' and return the randic valence connectivity index calculated as the summatory of the product
+#' of the valence corrected degree of each atom. This element calculated as Valence electrons - number of hydrogen over
+#' total electrons of the atom - valence electrons - 1. In this way this element take into account the effect of heteroatoms
+#' and multiple bonds.
+#'
+#'
+#' @return Randic valence connectivity index. Value is stored in Ouput_descp environment.
+#'
+#' @examples
+#' Randix_valence_index_calc()
+#'
+#' @export
+#'
+
+
+Randic_valence_index_calc <- function(){
+  if (is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Vadj_matrix_full) &
+      is.data.frame(Mol_mat$input) & is.data.frame(input_H_suppressed)) {
+    Randic_valence = 0
+    d = c()
+    Zval = c()
+    Ztot = c()
+    H = c()
+    valence_electrons = read.csv("tables/valence_electrons_table.csv")
+    for (h in 1:nrow(Mol_mat$input)) {
+      if (Mol_mat$input$Atom[h] != "H") {
+        H[h] <- sum(length(intersect(which(Mol_mat$graph_Vadj_matrix_full[,h] == 1), which(Mol_mat$input$Atom == "H"))))
+      }
+    }
+    H = H[- which(is.na(H))]
+
+    for (v in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
+      Ztot[v] <- valence_electrons$Total_electrons[which(valence_electrons$Symbol == as.character(input_H_suppressed$Atom[[v]]))] # total electrons
+      Zval[v] <- valence_electrons$valence_electrons[which(valence_electrons$Symbol == as.character(input_H_suppressed$Atom[[v]]))] ##valence electrons
+      }
+
+
+    for (k in 1:length(Zval)) {
+      d[k] <- (Zval[k] - H[k])/(Ztot[k] - Zval[k] - 1)
+    }
+
+    for (i in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
+      for (j in 1:ncol(Mol_mat$graph_Vadj_matrix)) {
+        if (j > i) {
+          Randic_valence = Randic_valence + Mol_mat$graph_Vadj_matrix[i,j]*(1/sqrt(d[i]*d[j]))
+        }
+      }
+    }
+
+    Output_descp$Randic_valence_index = Randic_valence
+
+    message("Randic valence connectivity index ... OK")
+  } else {
+    message("Randic valence connectivity index ... FAIL")
+  }
+}
 

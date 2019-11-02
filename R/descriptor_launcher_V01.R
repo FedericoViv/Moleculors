@@ -28,6 +28,10 @@ descriptor_launcher = function(){
 
     Balaban_index_calc()
 
+    Randic_index_calc()
+
+    Randic_valence_index_calc()
+
   } else {
     message("No molecular descriptors were computed")
   }
