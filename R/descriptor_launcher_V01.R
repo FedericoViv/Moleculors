@@ -32,6 +32,10 @@ descriptor_launcher = function(){
 
     Randic_valence_index_calc()
 
+    First_order_kappa_calc()
+
+    E_state()
+
   } else {
     message("No molecular descriptors were computed")
   }

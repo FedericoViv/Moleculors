@@ -229,11 +229,14 @@ Randic_valence_index_calc <- function(){
         H[h] <- sum(length(intersect(which(Mol_mat$graph_Vadj_matrix_full[,h] == 1), which(Mol_mat$input$Atom == "H"))))
       }
     }
-    H = H[- which(is.na(H))]
+    if (sum(is.na(H)) >= 1) {
+      H = H[- which(is.na(H))]
+    }
+
 
     for (v in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
-      Ztot[v] <- valence_electrons$Total_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))] # total electrons
-      Zval[v] <- valence_electrons$valence_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))] ##valence electrons
+      Ztot[v] <- valence_electrons$Total_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))]
+      Zval[v] <- valence_electrons$valence_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))]
       }
 
 
@@ -257,3 +260,113 @@ Randic_valence_index_calc <- function(){
   }
 }
 
+
+#' Moleculors Kappa shape index first order
+#'
+#' This function takes the vertex adjacency matrix and the edge adjacency matrix and
+#' return the first order Kappa shape index. This parameters gives information about the
+#' shape of the molecule. As K is calculated as Pmin * Pmax /P where Pmin = V -1
+#' Pmax = V * 'V-1' and P is the number of paths of the molecules aka edges.
+#' This parameter gives information about the numbers of cycles inside the molecule. The lower
+#' K compared to V the more cycle are present.
+#'
+#'
+#' @return First order kappa shape index. Value is stored in Ouput_descp environment.
+#'
+#' @examples
+#' First_order_kappa_calc()
+#'
+#' @export
+#'
+
+First_order_kappa_calc <- function() {
+  if (is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Eadj_matrix)) {
+
+    Pmin = nrow(Mol_mat$graph_Vadj_matrix) - 1
+    Pmax = (nrow(Mol_mat$graph_Vadj_matrix) * (nrow(Mol_mat$graph_Vadj_matrix) - 1))/2
+
+    kappa1 = 2*(Pmin * Pmax)/(nrow(Mol_mat$graph_Eadj_matrix)* nrow(Mol_mat$graph_Eadj_matrix))
+
+    Output_descp$kappa_first_index = kappa1
+
+    message("First order Kappa shape index ... OK")
+  } else {
+    message("First order Kappa shape index ... FAIL")
+  }
+}
+
+
+#' Moleculors Electrotopological state index
+#'
+#' This function requires access to the vertex adjacency matrices, full and suppressed, to the
+#' raw inputs, full and suppressed, to the vertex laplacian matrix and to the vertex distance matrix
+#' in order to compute the E-state index for the whole molecule. This is computed by calculating first
+#' the intrinsic factor for each atom as 2/principal quanto number ^2 x valence degree + 1 / degree of the atom
+#' and correcting this factor by a Di equal to the summatory of intrinsic state of atom i - intrinsic state of atom j
+#' over the topological distanze r + 1^2. The obtained E-state index I + Di can be used for the single atoms of can be summed
+#' to get the E-state of substituent or, as was done in this function, to compute the whole molecule E-state
+#'
+#' @return E-state index for the selected molecule. Value is stored in Ouput_descp environment.
+#'
+#' @examples
+#' E_state()
+#'
+#' @export
+#'
+
+E_state <- function() {
+  if (is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Vadj_matrix_full) &
+      is.data.frame(Mol_mat$input) & is.data.frame(Mol_mat$input_H_suppressed) &
+      is.matrix(Mol_mat$graph_Vdistance_matrix) & is.matrix(Mol_mat$graph_Vlaplacian_matrix)) {
+
+    d = c()
+    Zval = c()
+    Ztot = c()
+    H = c()
+    intrinsic_state = c()
+    di = c(rep(0, nrow(Mol_mat$graph_Vadj_matrix)))
+    total_Estate = 0
+
+    valence_electrons = read.csv("tables/valence_electrons_table.csv")
+    for (h in 1:nrow(Mol_mat$input)) {
+      if (Mol_mat$input$Atom[h] != "H") {
+        H[h] <- sum(length(intersect(which(Mol_mat$graph_Vadj_matrix_full[,h] == 1), which(Mol_mat$input$Atom == "H"))))
+      }
+    }
+    if (sum(is.na(H)) >= 1) {
+      H = H[- which(is.na(H))]
+    }
+
+    for (v in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
+      Ztot[v] <- valence_electrons$Total_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))]
+      Zval[v] <- valence_electrons$valence_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))]
+    }
+
+
+    for (k in 1:length(Zval)) {
+      d[k] <- (Zval[k] - H[k])/(Ztot[k] - Zval[k] - 1)
+    }
+
+
+    for (i in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
+      intrinsic_state[i] <- (((2/valence_electrons$Principal_quantum_number[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[i]]))])^2) *
+                                      d[i] + 1)/Mol_mat$graph_Vlaplacian_matrix[i,i]
+    }
+
+    for (y in 1:length(intrinsic_state)) {
+      for (j in 1:length(intrinsic_state)) {
+        di[y] <- di[y] + (intrinsic_state[y] - intrinsic_state[j])/(Mol_mat$graph_Vdistance_matrix[y,j] + 1)^2
+      }
+    }
+
+    for (z in 1:length(intrinsic_state)) {
+      total_Estate = total_Estate + intrinsic_state[z] + di[z]
+    }
+
+    Output_descp$total_Estate_index = total_Estate
+
+    message("E-state index ... OK")
+  } else {
+    message("E-state index ... FAIL")
+  }
+}
