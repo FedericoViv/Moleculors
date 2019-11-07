@@ -36,6 +36,15 @@ descriptor_launcher = function(){
 
     E_state()
 
+    Data_summary <- data.frame(1)
+
+    for (i in 1:length(names(Output_descp))) {
+
+      Data_summary[i] <- get(names(Output_descp)[i], envir = Output_descp)
+
+      names(Data_summary)[i] <- names(Output_descp)[i]
+    }
+
   } else {
     message("No molecular descriptors were computed")
   }

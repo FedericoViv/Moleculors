@@ -108,9 +108,10 @@ file_dump = function(){
   tail[1,1] = gbutton(
     "Download output file",
     handler = function(h, ...){
-
+      write.csv(Data_summary, file = as.character(svalue(tail[2,1])))
     }
   )
+  tail[2,1] = gedit()
 }
 
 
