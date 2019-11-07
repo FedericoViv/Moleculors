@@ -145,7 +145,7 @@ Vadj_matrix = function(Cart_Input_Hsupp){
 
   for (i in 1:nrow(graph_Vadj_matrix)) {
     for (j in 1:nrow(graph_Vadj_matrix)) {
-      if ((graph_Vadj_matrix[i,j] - min(graph_Vadj_matrix[1,-1])) <= 0.1 & i != j) {
+      if ((graph_Vadj_matrix[i,j] - min(graph_Vadj_matrix[1,-1])) <= 0.5 & i != j) {
         graph_Vadj_matrix[i,j] = min(graph_Vadj_matrix[1,-1])
       }
     }
