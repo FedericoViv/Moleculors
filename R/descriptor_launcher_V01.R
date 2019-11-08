@@ -36,7 +36,7 @@ descriptor_launcher = function(){
 
     E_state()
 
-    assign("Data_summary", data.frame(1), envir = globalenv())
+    Data_summary <- data.frame(1)
 
     for (i in 1:length(names(Output_descp))) {
 
@@ -44,6 +44,8 @@ descriptor_launcher = function(){
 
       names(Data_summary)[i] <- names(Output_descp)[i]
     }
+
+    assign("Data_summary", Data_summary, envir = globalenv())
 
   } else {
     message("No molecular descriptors were computed")
