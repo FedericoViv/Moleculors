@@ -38,6 +38,8 @@ descriptor_launcher = function(){
 
     Data_summary <- data.frame(1)
 
+    environment(Data_summary) = globalenv()
+
     for (i in 1:length(names(Output_descp))) {
 
       Data_summary[i] <- get(names(Output_descp)[i], envir = Output_descp)
