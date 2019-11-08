@@ -36,7 +36,7 @@ descriptor_launcher = function(){
 
     E_state()
 
-    assign(Data_frame, data.frame(1), envir = globalenv())
+    assign("Data_summary", data.frame(1), envir = globalenv())
 
     for (i in 1:length(names(Output_descp))) {
 
