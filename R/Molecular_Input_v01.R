@@ -76,7 +76,7 @@ molecular_input_multiple <- function(){
 
   for (i in 1:length(data_names)) {
 
-    cartesian_coordinates[[i]] <- read.csv(data_names[i])
+    cartesian_coordinates[[i]] <- read.csv(data_names[i], header = FALSE)
     names(cartesian_coordinates[[i]]) = c("Atom", "X", "Y", "Z")
 
   }
@@ -84,6 +84,49 @@ molecular_input_multiple <- function(){
   Mol_mat$input_list = cartesian_coordinates
 
 }
+
+#' prediction matrix loader.
+#'
+#' This function take as input the prediction vector to be used
+#' for the training of the NN for the qsar study and store the information in
+#' the prediction matrix
+#'
+#'
+#'
+#' @examples
+#' prediction_parameter()
+#'
+#'
+#' @export
+
+prediction_parameter <- function(){
+
+  prediction_matrix <- read.csv(file.choose(), header = FALSE)
+
+  if (ncol(prediction_matrix) > 1) {
+    return(message("Error in prediction matrix structure. COL > 1"))
+
+  } else {
+
+    assign("prediction_matrix", prediction_matrix, envir = globalenv())
+  }
+}
+
+
+#' Moleculors multiple graph and descriptor calculator.
+#'
+#' This function loop through the multiple input selected and calculate
+#' the graphical matrices and descriptor for each molecule. Results are stored
+#' in the descriptor matrix where each column is a molecule and each row are the
+#' orded descriptors
+#'
+#'
+#'
+#' @examples
+#' moleculors_multiple_descriptor()
+#'
+#'
+#' @export
 
 
 moleculors_multiple_descriptor <- function() {
