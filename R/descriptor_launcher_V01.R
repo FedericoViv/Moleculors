@@ -36,6 +36,8 @@ descriptor_launcher = function(){
 
     E_state()
 
+    Bulk_index()
+
     Data_summary <- data.frame(1)
 
     for (i in 1:length(names(Output_descp))) {

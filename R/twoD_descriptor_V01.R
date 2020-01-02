@@ -370,3 +370,53 @@ E_state <- function() {
     message("E-state index ... FAIL")
   }
 }
+
+
+
+#' Moleculors Molecular bulk index
+#'
+#' This function define the molecular bulk of the selected molecule as
+#' the summatory of Z - Zv / Z * 1/ PN -1
+#' where Z is the atomic number of the selected atom, Zv is the number of
+#' valence electrons and PN is the periodic number of the atom.
+#' The only required matrix is the input_H_suppressed as Hydrogen volume is taken
+#' as reference and thus its value is set to zero.
+#'
+#' @return Molecular bulk for the selected molecule. Value is stored in Ouput_descp environment.
+#'
+#' @examples
+#' Bulk_index()
+#'
+#' @export
+#'
+
+Bulk_index <- function() {
+  if ( is.data.frame(Mol_mat$input_H_suppressed)) {
+
+    d <- c()
+    Zval <- c()
+    Ztot <- c()
+    total_bulk <- 0
+
+    valence_electrons <- read.csv("tables/valence_electrons_table.csv")
+
+    for (v in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
+      Ztot[v] <- valence_electrons$Total_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))]
+      Zval[v] <- valence_electrons$valence_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))]
+      PN[v] <- valence_electrons$Principal_quantum_number[which(valence_electrons$symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))]
+    }
+
+
+    for (k in 1:length(Zval)) {
+      d[k] <- ((Ztot[k] - Zval[k])/Zval[k])*(1/(PN[k] - 1))
+    }
+
+    total_bulk <- sum(d)
+
+    Output_descp$bulk_index = total_bulk
+
+    message("Bulk index ... OK")
+  } else {
+    message("Bulk index ... FAIL")
+  }
+}
