@@ -390,7 +390,7 @@ E_state <- function() {
 #' @export
 #'
 
-Bulk_index <- function() {
+Bulk_index_calc <- function() {
   if ( is.data.frame(Mol_mat$input_H_suppressed)) {
 
     d <- c()
@@ -404,7 +404,7 @@ Bulk_index <- function() {
     for (v in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
       Ztot[v] <- valence_electrons$Total_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))]
       Zval[v] <- valence_electrons$valence_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))]
-      PN[v] <- valence_electrons$Principal_quantum_number[which(valence_electrons$symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))]
+      PN[v] <- valence_electrons$Principal_quantum_number[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))]
     }
 
 
@@ -414,7 +414,7 @@ Bulk_index <- function() {
 
     total_bulk <- sum(d)
 
-    Output_descp$bulk_index = total_bulk
+    Output_descp$Bulk_index = total_bulk
 
     message("Bulk index ... OK")
   } else {

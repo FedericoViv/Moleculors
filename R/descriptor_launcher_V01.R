@@ -36,7 +36,7 @@ descriptor_launcher = function(){
 
     E_state()
 
-    Bulk_index()
+    Bulk_index_calc()
 
     Data_summary <- data.frame(1)
 
