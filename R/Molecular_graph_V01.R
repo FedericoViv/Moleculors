@@ -39,10 +39,12 @@ graphical_matrix = function(){
         hydrogen_vector = append(hydrogen_vector, i)
 
       }
-      if (i == nrow(Mol_mat$input)) {
+      if (i == nrow(Mol_mat$input) & length(hydrogen_vector) > 0) {
 
         Mol_mat$input_H_suppressed = Mol_mat$input[-hydrogen_vector,]
 
+      } else {
+        Mol_mat$input_H_suppressed <- Mol_mat$input
       }
     }
 
@@ -289,7 +291,7 @@ VCdistance_matrix = function(){
 Eadj_matrix = function(Cart_Input_Hsupp){
 
   if (is.matrix(Mol_mat$graph_Vadj_matrix)) {
-    edge_matrix = matrix(nrow = nrow(Cart_Input_Hsupp),
+    edge_matrix = matrix(nrow = nrow(Cart_Input_Hsupp) + 5,
                          ncol = (ncol(Cart_Input_Hsupp)-1))
     h = 1
     counter = 1
@@ -334,7 +336,7 @@ Eadj_matrix = function(Cart_Input_Hsupp){
 
     for (i in 1:nrow(graph_Eadj_matrix)) {
       for (j in 1:nrow(graph_Eadj_matrix)) {
-        if ((graph_Eadj_matrix[i,j] - min(graph_Eadj_matrix[1,-1])) <= 0.1 & i != j) {
+        if ((graph_Eadj_matrix[i,j] - min(graph_Eadj_matrix[1,-1])) <= 0.5 & i != j) {
           graph_Eadj_matrix[i,j] = min(graph_Eadj_matrix[1,-1])
         }
       }
@@ -399,12 +401,15 @@ Edistance_matrix = function(){
           graph_Edistance_matrix[i,j] = 0
         } else if (i != j & Mol_mat$graph_Eadj_matrix[i,j] == 0) {
           connection_vector = connections[[i]]
-          while (!(j %in% connection_vector)) {
+          while (!(j %in% unique(connection_vector))) {
             connections_holder = c()
-            for (k in 1:length(connection_vector)) {
-              connections_holder = append(connections_holder, connections[[connection_vector[k]]])
+            for (k in 1:length(unique(connection_vector))) {
+              connections_holder = append(connections_holder, connections[[unique(connection_vector)[k]]])
             }
             d = d + 1
+            if (d > nrow(Mol_mat$graph_Eadj_matrix)) {
+              return(message("Edge distance matrix ... FAIL"))
+            }
             connection_vector = connections_holder
           }
           graph_Edistance_matrix[i,j] = d
@@ -1056,7 +1061,7 @@ Vadj_matrix_full = function(full_input){
 
   for (i in 1:nrow(graph_Vadj_matrix_full)) {
     for (j in 1:nrow(graph_Vadj_matrix_full)) {
-      if ((graph_Vadj_matrix_full[i,j] - min(graph_Vadj_matrix_full[1,-1])) <= 0.5 & i != j) {
+      if ((graph_Vadj_matrix_full[i,j] - min(graph_Vadj_matrix_full[1,-1])) <= 0.3 & i != j) {
         graph_Vadj_matrix_full[i,j] = min(graph_Vadj_matrix_full[1,-1])
       }
     }

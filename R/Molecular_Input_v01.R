@@ -133,7 +133,8 @@ moleculors_multiple_descriptor <- function() {
 
   if (length(Mol_mat$input_list) > 0 ) {
 
-    descriptor_matrix = matrix(ncol = length(Mol_mat$input_list), nrow = 10)
+    descriptor_matrix = matrix(ncol = length(Mol_mat$input_list), nrow = 11)
+
 
     for (i in 1:length(Mol_mat$input_list)) {
 
@@ -148,7 +149,6 @@ moleculors_multiple_descriptor <- function() {
       descriptor_launcher()
 
       descriptor_matrix[,i] <- t(as.matrix(Data_summary))
-
 
     }
 
