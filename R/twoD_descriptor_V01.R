@@ -397,6 +397,7 @@ Bulk_index <- function() {
     Zval <- c()
     Ztot <- c()
     total_bulk <- 0
+    PN <- c()
 
     valence_electrons <- read.csv("tables/valence_electrons_table.csv")
 
