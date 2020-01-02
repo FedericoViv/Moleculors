@@ -122,8 +122,3 @@ QSAR_NN_model <- function(descriptor, predictor, train_split = 0.75, hl = 4, lr 
 ## prototype version ##
 
 
-
-library(ggplot2)
-
-ggplot(data = loss_df, aes(x = iteration, y = loss)) +
-  geom_line()
