@@ -38,6 +38,8 @@ descriptor_launcher = function(){
 
     Bulk_index_calc()
 
+    Hydro_factor_calc()
+
     Data_summary <- data.frame(1)
 
     for (i in 1:length(names(Output_descp))) {

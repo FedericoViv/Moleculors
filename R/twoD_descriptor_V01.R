@@ -385,7 +385,7 @@ E_state <- function() {
 #' @return Molecular bulk for the selected molecule. Value is stored in Ouput_descp environment.
 #'
 #' @examples
-#' Bulk_index()
+#' Bulk_index_calc()
 #'
 #' @export
 #'
@@ -420,4 +420,90 @@ Bulk_index_calc <- function() {
   } else {
     message("Bulk index ... FAIL")
   }
+}
+
+#' Moleculors hydrophilicity factor
+#'
+#' This function define the hydrophilicity factor of the input molecule as:
+#' Hy = ""1+Nhy" *log2 "1+Nhy" + Nc "1/A log2 1/A" + sqrt"Nhy/A^2""/log"1+A"
+#' where Nhy is the number of hydrogen attached to oxygen sulfur or nitrogen groups,
+#' Nc is the number of carbons and A is the number of non hydrogen atoms
+#'
+#' @return Hydrophilicity factor for the input molecule. Value is stored in Ouput_descp environment.
+#'
+#' @examples
+#' Hydro_factor_calc()
+#'
+#' @export
+#'
+
+Hydro_factor_calc <- function(){
+  if (is.data.frame(Mol_mat$input) & is.matrix(Mol_mat$graph_Vadj_matrix_full)) {
+
+    Nc <- sum(length(which(Mol_mat$input$Atom == "C")))
+    A <- sum(length(which(Mol_mat$input$Atom != "H")))
+    Nhy <- 0
+
+    for (i in 1:nrow(Mol_mat$graph_Vadj_matrix_full)) {
+      if (Mol_mat$input$Atom[i] == "O" | Mol_mat$input$Atom[i] == "S" | Mol_mat$input$Atom[i] == "N") {
+        for (j in 1:ncol(Mol_mat$graph_Vadj_matrix_full)) {
+          if (Mol_mat$graph_Vadj_matrix_full[i,j] == 1 & Mol_mat$input$Atom[j] == "H") {
+            Nhy <- Nhy + 1
+          }
+        }
+      }
+    }
+
+    Hy <- ((1 + Nhy)*log2(1 + Nhy) + Nc*((1/A)*log2(1/A)) + sqrt(Nhy/(A^2)))/log2(1 + A)
+
+    Output_descp$Hydro_factor <- Hy
+
+    message("Hydrphilicity factor ... OK")
+  } else {
+    message("Hydrphilicity factor ... FAIL")
+  }
+
+}
+
+
+#' Moleculors Unsaturation Index
+#'
+#' This function define the unsaturation index as follow:
+#' UI = log2 "1 + SBO + nB" where nD is the number of bonds
+#' and SBO is the sum of bonds order in the molecule. The H suppressed matrix is used for
+#' the computation.
+#'
+#' @return Unsaturation index of the input molecule. Value is stored in Ouput_descp environment.
+#'
+#' @examples
+#' Unsaturation_index_calc()
+#'
+#' @export
+#'
+
+Unsaturation_index_calc <- function() {
+
+  if (is.data.frame(Mol_mat$input) & is.matrix(Mol_mat$graph_Vadj_matrix_full) &
+      is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Eadj_matrix)) {
+
+    nB <- nrow(Mol_mat$graph_Eadj_matrix)
+    SBO <- 0
+
+
+    for (i in 1:nrow(Mol_mat$graph_Vadj_matrix_full)) {
+      counter <- 0
+      Bond
+      if (Mol_mat$input$Atom[i] != "H") {
+        counter <- sum(Mol_mat$graph_Vadj_matrix_full[i,])
+        if (Mol_mat$input$Atom[i] == "C" & 4-counter == 1) {
+          Bond <- 2
+        } else if (Mol_mat$input$Atom[i] == "C" & 4-counter == 2)
+          Bond <- 3
+      }
+
+    }
+
+
+  }
+
 }

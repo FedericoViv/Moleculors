@@ -59,6 +59,8 @@ graphical_matrix = function(){
 
     Eadj_matrix(Mol_mat$input_H_suppressed)
 
+    Eadj_matrix_full(Mol_mat$input)
+
     Edistance_matrix()
 
     ECdistance_matrix()
@@ -1080,6 +1082,98 @@ Vadj_matrix_full = function(full_input){
   Mol_mat$graph_Vadj_matrix_full = graph_Vadj_matrix_full
 
   message("Vertex full adjacency matrix ... OK")
+}
+
+
+#' Moleculors edge adjacency matrix full
+#'
+#' This function require the cartesian matrix
+#' and the adjacency matrix for the vertexes in order to compute
+#' the edge cartesian matrix and the adjacency edges matrices.
+#'
+#'
+#' @param Cart_Input Cartesian coordinates of the molecule without the hydrogen atoms
+#'
+#' @return Edge adjacency matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Eadj_matrix_full(input)
+#'
+#' @export
+#'
+
+
+Eadj_matrix_full = function(Cart_Input){
+
+  if (is.matrix(Mol_mat$graph_Vadj_matrix_full)) {
+    edge_matrix = matrix(nrow = nrow(Cart_Input) + 5,
+                         ncol = (ncol(Cart_Input)-1))
+    h = 1
+    counter = 1
+
+    for (i in 1:nrow(Mol_mat$graph_Vadj_matrix_full)) {
+      for (j in h:nrow(Mol_mat$graph_Vadj_matrix_full)) {
+        if (Mol_mat$graph_Vadj_matrix_full[i,j] == 1) {
+          edge_matrix[counter, 1] = (Cart_Input$X[i] + Cart_Input$X[j])/2
+          edge_matrix[counter, 2] = (Cart_Input$Y[i] + Cart_Input$Y[j])/2
+          edge_matrix[counter, 3] = (Cart_Input$Z[i] + Cart_Input$Z[j])/2
+          counter = counter + 1
+        }
+      }
+      h = h + 1
+    }
+
+    graph_Eadj_matrix = matrix(nrow = nrow(edge_matrix), ncol = nrow(edge_matrix))
+
+
+    for (i in 1:nrow(graph_Eadj_matrix)) {
+      for (j in 1:ncol(graph_Eadj_matrix)) {
+        graph_Eadj_matrix[i,j] = sqrt((edge_matrix[j,1] - edge_matrix[i,1])^2 +
+                                        (edge_matrix[j,2] - edge_matrix[i,2])^2 +
+                                        (edge_matrix[j,3] - edge_matrix[i,3])^2)
+      }
+    }
+
+    NA_vector = c()
+
+    for (j in 1:ncol(graph_Eadj_matrix)) {
+      if (is.na(graph_Eadj_matrix[1,j]) & !(j %in% NA_vector)) {
+        NA_vector = append(NA_vector, j)
+      }
+    }
+
+    if (!(is.null(NA_vector))) {
+      graph_Eadj_matrix = graph_Eadj_matrix[-NA_vector, -NA_vector]
+    }
+
+
+    graph_Eadj_matrix = apply(graph_Eadj_matrix, 2, round, 2)
+
+    for (i in 1:nrow(graph_Eadj_matrix)) {
+      for (j in 1:nrow(graph_Eadj_matrix)) {
+        if ((graph_Eadj_matrix[i,j] - min(graph_Eadj_matrix[1,-1])) <= 0.5 & i != j) {
+          graph_Eadj_matrix[i,j] = min(graph_Eadj_matrix[1,-1])
+        }
+      }
+    }
+
+    graph_Eadj_matrix = apply(graph_Eadj_matrix, 2, `/`, min(graph_Eadj_matrix[1,-1]))
+
+    for (i in 1:nrow(graph_Eadj_matrix)) {
+      for (j in 1:nrow(graph_Eadj_matrix)) {
+        if (graph_Eadj_matrix[i,j] != 1) {
+          graph_Eadj_matrix[i,j] = 0
+        }
+      }
+    }
+
+    Mol_mat$graph_Eadj_matrix_full = graph_Eadj_matrix
+
+    message("Full Edge adjacency matrix ... OK")
+  } else {
+    message("Full Edge adjacency matrix ... FAIL")
+  }
+
 }
 
 
