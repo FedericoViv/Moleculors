@@ -458,9 +458,9 @@ Hydro_factor_calc <- function(){
 
     Output_descp$Hydro_factor <- Hy
 
-    message("Hydrphilicity factor ... OK")
+    message("Hydrophilicity factor ... OK")
   } else {
-    message("Hydrphilicity factor ... FAIL")
+    message("Hydrophilicity factor ... FAIL")
   }
 
 }

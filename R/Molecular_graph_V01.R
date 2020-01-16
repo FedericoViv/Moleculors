@@ -293,7 +293,7 @@ VCdistance_matrix = function(){
 Eadj_matrix = function(Cart_Input_Hsupp){
 
   if (is.matrix(Mol_mat$graph_Vadj_matrix)) {
-    edge_matrix = matrix(nrow = nrow(Cart_Input_Hsupp) + 5,
+    edge_matrix = matrix(nrow = nrow(Cart_Input_Hsupp) + 10,
                          ncol = (ncol(Cart_Input_Hsupp)-1))
     h = 1
     counter = 1
@@ -1106,7 +1106,7 @@ Vadj_matrix_full = function(full_input){
 Eadj_matrix_full = function(Cart_Input){
 
   if (is.matrix(Mol_mat$graph_Vadj_matrix_full)) {
-    edge_matrix = matrix(nrow = nrow(Cart_Input) + 5,
+    edge_matrix = matrix(nrow = nrow(Cart_Input) + 10,
                          ncol = (ncol(Cart_Input)-1))
     h = 1
     counter = 1
