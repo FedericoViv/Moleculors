@@ -149,21 +149,31 @@ Vadj_matrix = function(Cart_Input_Hsupp){
 
   for (i in 1:nrow(graph_Vadj_matrix)) {
     for (j in 1:nrow(graph_Vadj_matrix)) {
-      if ((graph_Vadj_matrix[i,j] - min(graph_Vadj_matrix[1,-1])) <= 0.5 & i != j) {
-        graph_Vadj_matrix[i,j] = min(graph_Vadj_matrix[1,-1])
+      if ((graph_Vadj_matrix[i,j] - min(graph_Vadj_matrix[i,-i])) <= 0.5 & i != j & j > i) {
+        graph_Vadj_matrix[i,j] = min(graph_Vadj_matrix[i,-i])
       }
     }
   }
 
-  graph_Vadj_matrix = apply(graph_Vadj_matrix, 2, `/`, min(graph_Vadj_matrix[1,-1]))
+  for (i in 1:nrow(graph_Vadj_matrix)) {
+    divider = min(graph_Vadj_matrix[i,-i])
+    for (j in 1:nrow(graph_Vadj_matrix)) {
+      if (i != j & j > i) {
+        graph_Vadj_matrix[i,j] = graph_Vadj_matrix[i,j]/divider
+      }
+    }
+  }
+
 
   for (i in 1:nrow(graph_Vadj_matrix)) {
     for (j in 1:nrow(graph_Vadj_matrix)) {
       if (graph_Vadj_matrix[i,j] != 1) {
         graph_Vadj_matrix[i,j] = 0
       }
+      graph_Vadj_matrix[j,i] = graph_Vadj_matrix[i,j]
     }
   }
+
 
   Mol_mat$graph_Vadj_matrix = graph_Vadj_matrix
 
@@ -293,7 +303,7 @@ VCdistance_matrix = function(){
 Eadj_matrix = function(Cart_Input_Hsupp){
 
   if (is.matrix(Mol_mat$graph_Vadj_matrix)) {
-    edge_matrix = matrix(nrow = nrow(Cart_Input_Hsupp) + 10,
+    edge_matrix = matrix(nrow = nrow(Cart_Input_Hsupp)*3,
                          ncol = (ncol(Cart_Input_Hsupp)-1))
     h = 1
     counter = 1
@@ -338,22 +348,30 @@ Eadj_matrix = function(Cart_Input_Hsupp){
 
     for (i in 1:nrow(graph_Eadj_matrix)) {
       for (j in 1:nrow(graph_Eadj_matrix)) {
-        if ((graph_Eadj_matrix[i,j] - min(graph_Eadj_matrix[1,-1])) <= 0.5 & i != j) {
-          graph_Eadj_matrix[i,j] = min(graph_Eadj_matrix[1,-1])
+        if ((graph_Eadj_matrix[i,j] - min(graph_Eadj_matrix[i,-i])) <= 0.5 & i != j & j > i) {
+          graph_Eadj_matrix[i,j] = min(graph_Eadj_matrix[i,-i])
         }
       }
     }
 
-    graph_Eadj_matrix = apply(graph_Eadj_matrix, 2, `/`, min(graph_Eadj_matrix[1,-1]))
+    for (i in 1:nrow(graph_Eadj_matrix)) {
+      divider = min(graph_Eadj_matrix[i,-i])
+      for (j in 1:nrow(graph_Eadj_matrix)) {
+        if (i != j & j > i) {
+          graph_Eadj_matrix[i,j] = graph_Eadj_matrix[i,j]/divider
+        }
+      }
+    }
+
 
     for (i in 1:nrow(graph_Eadj_matrix)) {
       for (j in 1:nrow(graph_Eadj_matrix)) {
         if (graph_Eadj_matrix[i,j] != 1) {
           graph_Eadj_matrix[i,j] = 0
         }
+        graph_Eadj_matrix[j,i] = graph_Eadj_matrix[i,j]
       }
     }
-
     Mol_mat$graph_Eadj_matrix = graph_Eadj_matrix
 
     message("Edge adjacency matrix ... OK")
@@ -1063,19 +1081,28 @@ Vadj_matrix_full = function(full_input){
 
   for (i in 1:nrow(graph_Vadj_matrix_full)) {
     for (j in 1:nrow(graph_Vadj_matrix_full)) {
-      if ((graph_Vadj_matrix_full[i,j] - min(graph_Vadj_matrix_full[1,-1])) <= 0.5 & i != j) {
-        graph_Vadj_matrix_full[i,j] = min(graph_Vadj_matrix_full[1,-1])
+      if ((graph_Vadj_matrix_full[i,j] - min(graph_Vadj_matrix_full[i,-i])) <= 0.5 & i != j & j > i) {
+        graph_Vadj_matrix_full[i,j] = min(graph_Vadj_matrix_full[i,-i])
       }
     }
   }
 
-  graph_Vadj_matrix_full = apply(graph_Vadj_matrix_full, 2, `/`, min(graph_Vadj_matrix_full[1,-1]))
+  for (i in 1:nrow(graph_Vadj_matrix_full)) {
+    divider = min(graph_Vadj_matrix_full[i,-i])
+    for (j in 1:nrow(graph_Vadj_matrix_full)) {
+      if (i != j & j > i) {
+        graph_Vadj_matrix_full[i,j] = graph_Vadj_matrix_full[i,j]/divider
+      }
+    }
+  }
+
 
   for (i in 1:nrow(graph_Vadj_matrix_full)) {
     for (j in 1:nrow(graph_Vadj_matrix_full)) {
       if (graph_Vadj_matrix_full[i,j] != 1) {
         graph_Vadj_matrix_full[i,j] = 0
       }
+      graph_Vadj_matrix_full[j,i] = graph_Vadj_matrix_full[i,j]
     }
   }
 
@@ -1106,7 +1133,7 @@ Vadj_matrix_full = function(full_input){
 Eadj_matrix_full = function(Cart_Input){
 
   if (is.matrix(Mol_mat$graph_Vadj_matrix_full)) {
-    edge_matrix = matrix(nrow = nrow(Cart_Input) + 10,
+    edge_matrix = matrix(nrow = nrow(Cart_Input)*3,
                          ncol = (ncol(Cart_Input)-1))
     h = 1
     counter = 1
@@ -1151,19 +1178,28 @@ Eadj_matrix_full = function(Cart_Input){
 
     for (i in 1:nrow(graph_Eadj_matrix)) {
       for (j in 1:nrow(graph_Eadj_matrix)) {
-        if ((graph_Eadj_matrix[i,j] - min(graph_Eadj_matrix[1,-1])) <= 0.5 & i != j) {
-          graph_Eadj_matrix[i,j] = min(graph_Eadj_matrix[1,-1])
+        if ((graph_Eadj_matrix[i,j] - min(graph_Eadj_matrix[i,-i])) <= 0.5 & i != j & j > i) {
+          graph_Eadj_matrix[i,j] = min(graph_Eadj_matrix[i,-i])
         }
       }
     }
 
-    graph_Eadj_matrix = apply(graph_Eadj_matrix, 2, `/`, min(graph_Eadj_matrix[1,-1]))
+    for (i in 1:nrow(graph_Eadj_matrix)) {
+      divider = min(graph_Eadj_matrix[i,-i])
+      for (j in 1:nrow(graph_Eadj_matrix)) {
+        if (i != j & j > i) {
+          graph_Eadj_matrix[i,j] = graph_Eadj_matrix[i,j]/divider
+        }
+      }
+    }
+
 
     for (i in 1:nrow(graph_Eadj_matrix)) {
       for (j in 1:nrow(graph_Eadj_matrix)) {
         if (graph_Eadj_matrix[i,j] != 1) {
           graph_Eadj_matrix[i,j] = 0
         }
+        graph_Eadj_matrix[j,i] = graph_Eadj_matrix[i,j]
       }
     }
 
