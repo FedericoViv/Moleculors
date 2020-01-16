@@ -484,24 +484,34 @@ Hydro_factor_calc <- function(){
 Unsaturation_index_calc <- function() {
 
   if (is.data.frame(Mol_mat$input) & is.matrix(Mol_mat$graph_Vadj_matrix_full) &
-      is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Eadj_matrix)) {
+      is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Eadj_matrix_full)) {
 
-    nB <- nrow(Mol_mat$graph_Eadj_matrix)
+    nB <- nrow(Mol_mat$graph_Eadj_matrix_full)
     SBO <- 0
 
 
     for (i in 1:nrow(Mol_mat$graph_Vadj_matrix_full)) {
       counter <- 0
-      Bond
+      nDB <- 0
+      nTB <- 0
+      Bonds <- 0
       if (Mol_mat$input$Atom[i] != "H") {
         counter <- sum(Mol_mat$graph_Vadj_matrix_full[i,])
         if (Mol_mat$input$Atom[i] == "C" & 4-counter == 1) {
-          Bond <- 2
-        } else if (Mol_mat$input$Atom[i] == "C" & 4-counter == 2)
-          Bond <- 3
+          nDB <- 1
+        } else if (Mol_mat$input$Atom[i] == "C" & 4-counter == 2){
+          nTB <- 2
+        } else if (Mol_mat$input$Atom[i] %in% c("O","N","S") & 2-counter == 1){
+          nDB <- 1
+        }
+        Bonds <- counter + nDB + nTB
+
+        SBO <- SBO + Bonds/counter
       }
 
     }
+
+    UI <- log2(1 + SBO + nB)
 
 
   }

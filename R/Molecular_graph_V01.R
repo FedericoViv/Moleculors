@@ -1063,7 +1063,7 @@ Vadj_matrix_full = function(full_input){
 
   for (i in 1:nrow(graph_Vadj_matrix_full)) {
     for (j in 1:nrow(graph_Vadj_matrix_full)) {
-      if ((graph_Vadj_matrix_full[i,j] - min(graph_Vadj_matrix_full[1,-1])) <= 0.3 & i != j) {
+      if ((graph_Vadj_matrix_full[i,j] - min(graph_Vadj_matrix_full[1,-1])) <= 0.5 & i != j) {
         graph_Vadj_matrix_full[i,j] = min(graph_Vadj_matrix_full[1,-1])
       }
     }
