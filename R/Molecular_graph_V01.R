@@ -87,6 +87,8 @@ graphical_matrix = function(){
 
     Laplacian_Vdistance()
 
+    Laplacian_Vdistance_full()
+
     Laplacian_Edistance()
 
     Vadj_kneigh_matrix(2)
@@ -1211,6 +1213,47 @@ Eadj_matrix_full = function(Cart_Input){
   }
 
 }
+
+#' Moleculors full vertex Laplacian matrix
+#'
+#' This function return the laplacian matrix for the vertex distance matrix
+#' it take as input the Vadj_full_matrix and for each element return
+#' -1 if elemij = 1, sum'elemi, == 1' if i = j 'which is the angle of the vertex'
+#' and 0 for every other element
+#'
+#'
+#' @return Laplacian vertex full matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Laplacian_Vdistance_full()
+#'
+#' @export
+#'
+
+
+Laplacian_Vdistance_full = function(){
+
+  if (is.matrix(Mol_mat$graph_Vadj_matrix_full)) {
+    graph_Vlaplacian_matrix = matrix(nrow = nrow(Mol_mat$graph_Vadj_matrix_full), ncol = nrow(Mol_mat$graph_Vadj_matrix_full))
+    for (i in 1:nrow(Mol_mat$graph_Vadj_matrix_full)) {
+      for (j in 1:nrow(Mol_mat$graph_Vadj_matrix_full)) {
+        if (Mol_mat$graph_Vadj_matrix_full[i,j] == 1) {
+          graph_Vlaplacian_matrix[i,j] = - 1
+        } else if (i == j){
+          graph_Vlaplacian_matrix[i,j] = sum(Mol_mat$graph_Vadj_matrix_full[i,] == 1)
+        } else {
+          graph_Vlaplacian_matrix[i,j] = 0
+        }
+      }
+    }
+
+    Mol_mat$graph_Vlaplacian_full_matrix = graph_Vlaplacian_matrix
+    message("Laplacian vertex full matrix ... OK")
+  } else {
+    message("Laplacian vertex full matrix ... FAIL")
+  }
+}
+
 
 
 ########################################TO BE IMPLEMENTED ################################

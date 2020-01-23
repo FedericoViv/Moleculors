@@ -478,8 +478,10 @@ Hydro_factor_calc <- function(){
 #' @examples
 #' Unsaturation_index_calc()
 #'
-#' @export
 #'
+#'
+
+##### function under development
 
 Unsaturation_index_calc <- function() {
 
@@ -516,4 +518,65 @@ Unsaturation_index_calc <- function() {
 
   }
 
+}
+
+#' Moleculors mean electronic distribution index
+#'
+#' This function define the mean electronic distribution as follow:
+#' mED = 'number of coniugated double bonds/ number of atoms in the H suppresed matrix' +
+#' 'number of electron donators groups'/number of the double bonds * max distance from the double bonds  -
+#' 'number of electron actractor groups'/number of the double bonds * max distance from the double bonds
+#' a donator group is: C-C/OH/OR/NH2/NHR/NR2/SH/SR while an actractor is:
+#' NO2/CN/F/Cl/Br/I/C---C
+#'
+#' @return mean electronic distribution index. Value is stored in Ouput_descp environment.
+#'
+#' @examples
+#' Unsaturation_index_calc()
+#'
+#'
+#'
+
+MED_index_calc <- function(){
+  if (is.data.frame(Mol_mat$input) & is.matrix(Mol_mat$graph_Vlaplacian_full_matrix) &
+      is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Vadj_matrix_full) &
+      is.matrix(Mol_mat$input_H_suppressed) & is.matrix(Mol_mat$graph_Vdistance_matrix)){
+
+    bonds_library <- data.frame(atoms = c("H", "C", "N", "O", "S", "Cl", "Br", "F", "I"),
+                                bonds = c(1, 4, 3, 2, 2, 1, 1, 1, 1))
+
+    Nconj <- 0
+    Nat <- nrow(Mol_mat$input_H_suppressed)
+    dbonds <-0
+    skiprow <- c()
+
+    for (i in 1:nrow(Mol_mat$graph_Vlaplacian_full_matrix)) {
+      if (bonds_library[which(bonds_library$atoms == as.character(Mol_mat$input$Atom[i])),2] - Mol_mat$graph_Vlaplacian_full_matrix[i,i] == 1 & !i %in% skiprow) {
+        if (is.vector(skiprow)) {
+          skiprow_memory <- append(skiprow_memory,skiprow)
+        } else {
+          skiprow_memory <- c()
+        }
+        holder <- c()
+        skiprow <- c()
+        dbonds <- dbonds + 1
+        holder <- append(holder, which(Mol_mat$graph_Vlaplacian_full_matrix[i,] == -1))
+        for (j in 1:length(holder)) {
+          if ((bonds_library[which(bonds_library$atoms == as.character(Mol_mat$input$Atom[holder[j]])),2] - Mol_mat$graph_Vlaplacian_full_matrix[holder[j],holder[j]]) == 1) {
+            skiprow <- append(skiprow, holder[j])
+          }
+        }
+          Nconj <- length(unique(skiprow_memory))
+      }
+    }
+
+
+
+
+
+
+    message("mED index ... OK")
+  } else {
+    message("mED index ... FAIL")
+  }
 }
