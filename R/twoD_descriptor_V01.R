@@ -592,11 +592,15 @@ MED_index_calc <- function(){
         } else {
           Nactr <- Nactr + 1
         }
-      } else if (as.character(Mol_mat$input$Atom[i]) == "S")
+      } else if (as.character(Mol_mat$input$Atom[i]) == "S"){
         if (bonds_library[which(bonds_library$atoms == as.character(Mol_mat$input$Atom[i])),2] - Mol_mat$graph_Vlaplacian_full_matrix[i,i] == 0){
           Ndon <- Ndon + 1
         } else {
           Nactr <- Nactr + 1
+        }
+      } else if (as.character(Mol_mat$input$Atom[i]) == "O")
+        if (bonds_library[which(bonds_library$atoms == as.character(Mol_mat$input$Atom[i])),2] - Mol_mat$graph_Vlaplacian_full_matrix[i,i] == 0){
+          Ndon <- Ndon + 1
         }
     }
 
