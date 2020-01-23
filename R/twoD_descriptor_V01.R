@@ -534,13 +534,13 @@ Unsaturation_index_calc <- function() {
 #' @examples
 #' Unsaturation_index_calc()
 #'
-#'
+#' @export
 #'
 
 MED_index_calc <- function(){
   if (is.data.frame(Mol_mat$input) & is.matrix(Mol_mat$graph_Vlaplacian_full_matrix) &
       is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Vadj_matrix_full) &
-      is.matrix(Mol_mat$input_H_suppressed) & is.matrix(Mol_mat$graph_Vdistance_matrix)){
+      is.data.frame(Mol_mat$input_H_suppressed) & is.matrix(Mol_mat$graph_Vdistance_matrix)){
 
     bonds_library <- data.frame(atoms = c("H", "C", "N", "O", "S", "Cl", "Br", "F", "I"),
                                 bonds = c(1, 4, 3, 2, 2, 1, 1, 1, 1))
@@ -570,9 +570,39 @@ MED_index_calc <- function(){
       }
     }
 
+    Nactr <- 0
 
+    Ndon <- 0
 
+    for (i in 1:length(Mol_mat$input)) {
 
+      if (as.character(Mol_mat$input$Atom[i]) %in% c("Br", "Cl", "F", "I")) {
+        Nactr <- Nactr + 1
+      } else if (as.character(Mol_mat$input$Atom[i]) == "C"){
+        if (bonds_library[which(bonds_library$atoms == as.character(Mol_mat$input$Atom[i])),2] - Mol_mat$graph_Vlaplacian_full_matrix[i,i] == 2) {
+          Nactr <- Nactr + 1
+        } else if (bonds_library[which(bonds_library$atoms == as.character(Mol_mat$input$Atom[i])),2] - Mol_mat$graph_Vlaplacian_full_matrix[i,i] == 0) {
+          Ndon <- Ndon + 1
+        }
+      } else if (as.character(Mol_mat$input$Atom[i]) == "N"){
+        if (bonds_library[which(bonds_library$atoms == as.character(Mol_mat$input$Atom[i])),2] - Mol_mat$graph_Vlaplacian_full_matrix[i,i] == 0 &
+            ! "O" %in% Mol_mat$input$Atom[Mol_mat$graph_Vadj_matrix_full[i,]] |
+            bonds_library[which(bonds_library$atoms == as.character(Mol_mat$input$Atom[i])),2] - Mol_mat$graph_Vlaplacian_full_matrix[i,i] == 1) {
+          Ndon <- Ndon + 1
+        } else {
+          Nactr <- Nactr + 1
+        }
+      } else if (as.character(Mol_mat$input$Atom[i]) == "S")
+        if (bonds_library[which(bonds_library$atoms == as.character(Mol_mat$input$Atom[i])),2] - Mol_mat$graph_Vlaplacian_full_matrix[i,i] == 0){
+          Ndon <- Ndon + 1
+        } else {
+          Nactr <- Nactr + 1
+        }
+    }
+
+    mED <- (Nconj + Ndon/2 - Nactr)/Nat
+
+    Output_descp$mED <- mED
 
 
     message("mED index ... OK")

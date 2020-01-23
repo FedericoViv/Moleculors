@@ -40,6 +40,8 @@ descriptor_launcher = function(){
 
     Hydro_factor_calc()
 
+    MED_index_calc()
+
     Data_summary <- data.frame(1)
 
     for (i in 1:length(names(Output_descp))) {
