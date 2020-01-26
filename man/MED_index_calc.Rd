@@ -20,4 +20,7 @@ NO2/CN/F/Cl/Br/I/C---C
 \examples{
 Unsaturation_index_calc()
 
+
+
+
 }

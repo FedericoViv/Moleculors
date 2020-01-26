@@ -373,52 +373,185 @@ E_state <- function() {
 
 
 
-#' Moleculors Molecular bulk index
+#' Moleculors Molecular bulk indexes and Electronegativity indexes
 #'
 #' This function define the molecular bulk of the selected molecule as
-#' the summatory of Z - Zv / Z * 1/ PN -1
+#' the summatory of alpha, with alpha Z - Zv / Z * 1/ PN -1
 #' where Z is the atomic number of the selected atom, Zv is the number of
 #' valence electrons and PN is the periodic number of the atom.
-#' The only required matrix is the input_H_suppressed as Hydrogen volume is taken
-#' as reference and thus its value is set to zero.
+#' The comparison of alpha summatory with a reference molecules
+#' without heteroatoms allows the calculation of two other indexes
+#' dalphaA = 'summatory alpha - summatory alpha reference' / Natoms without hydrogens
+#' This index gives informations about the presence of heteroatoms
+#' dalphaB = 'sumamtory alpha reference - summatory alpha' /Natoms without hydrogens
+#' This index gives a rough count of hydrogen bond acceptor atoms and polar surface areas.
 #'
-#' @return Molecular bulk for the selected molecule. Value is stored in Ouput_descp environment.
+#' This function defines also the electronegativity index and other correlated indexes.
+#' epsilon = - alpha + 0.3* Zv Electronegativity of each atoms
+#' epsilon1 = summatory epsilon / Nof atoms including hydrogens. A measure of electronegativity atoms count
+#' epsilon2 = summatory of epsilon excluding hydrogens / Nof atoms excluding hydrogens
+#' epsilon3 = summatory of epsilon reference / Nof reference atoms
+#' epsilon4 = summatory of epsilon of the saturated carbon skeleton /Nof atoms saturated carbon skeleton
+#' epsilon5 = summatory of epsilon excluding hydrogens + summatory of epsilon of hydrogens attached to heteroatoms / Nof atoms excluding hydrogens + Nof hydrogens attached to heteroatoms
+#'
+#' DepsilonA =epsilon1 - epsilon3 measure of contribution of unsaturation and electronegative atom count
+#' DepsilonB = epsilon1 - epsilon4 measure of contribuion of unsaturation
+#' DepsilonC = epsilon3 - epsilon4 a measure of contribuion of electronegativity
+#' DepsilonD = epsilon2 - epsilon5 a measure of contribution of hydrogen-bond donor atoms
+#'
+#'
+#' @return 13 different indexes regarding: bulk and electronic distribution.  Values are stored in Ouput_descp environment.
 #'
 #' @examples
-#' Bulk_index_calc()
+#' Bulk_Electronegativity_indexes_calc()
 #'
 #' @export
 #'
 
-Bulk_index_calc <- function() {
-  if ( is.data.frame(Mol_mat$input_H_suppressed)) {
+Bulk_Electronegativity_indexes_calc <- function() {
+  if ( is.data.frame(Mol_mat$input_H_suppressed) & is.data.frame(Mol_mat$input) &
+       is.matrix(Mol_mat$graph_Vlaplacian_full_matrix) & is.matrix(Mol_mat$graph_Vadj_matrix_full)) {
 
-    d <- c()
+    alpha <- c()
+    epsilon <- c()
+    alphaR <- c()
+    epsilonR <- c()
     Zval <- c()
     Ztot <- c()
     total_bulk <- 0
     PN <- c()
+    ZvalR <- c()
+    ZtotR <- c()
+    total_bulkR <- 0
+    PNR <- c()
+
+    reference_alcane <- Mol_mat$input_H_suppressed
+
+    for (i in 1:nrow(reference_alcane)){
+      if (reference_alcane$Atom[i] != "C" ) {
+        reference_alcane[i] = "C"
+      }
+    }
+
+
+
 
     valence_electrons <- read.csv("tables/valence_electrons_table.csv")
 
-    for (v in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
+    for (v in 1:nrow(Mol_mat$input_H_suppressed)) {
       Ztot[v] <- valence_electrons$Total_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))]
       Zval[v] <- valence_electrons$valence_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))]
       PN[v] <- valence_electrons$Principal_quantum_number[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))]
+      ZtotR[v] <- valence_electrons$Total_electrons[which(valence_electrons$Symbol == as.character(reference_alcane$Atom[[v]]))]
+      ZvalR[v] <- valence_electrons$valence_electrons[which(valence_electrons$Symbol == as.character(reference_alcane$Atom[[v]]))]
+      PNR[v] <- valence_electrons$Principal_quantum_number[which(valence_electrons$Symbol == as.character(reference_alcane$Atom[[v]]))]
+
+      alpha[v] <- ((Ztot[v] - Zval[v])/Zval[v])*(1/(PN[v] - 1))
+      alphaR[v] <- ((ZtotR[v] - ZvalR[v])/ZvalR[v])*(1/(PNR[v] - 1))
+      epsilon[v] <- -alpha[v] +0.3*Zval[v]
+      epsilonR[v] <- -alphaR[v] +0.3*ZvalR[v]
+    }
+
+    alpha_full <- c()
+    epsilon_full <- c()
+    Zval_full <- c()
+    Ztot_full <- c()
+    PN_full <- c()
+    alpha_sat <- c()
+    epsilon_sat <- c()
+    Zval_sat <- c()
+    Ztot_sat <- c()
+    PN_sat <- c()
+
+
+    saturated_skeleton <- Mol_mat$input
+    adding_hydrogen <- 0
+
+    for (h in 1:nrow(saturated_skeleton)) {
+      if (Mol_mat$graph_Vlaplacian_full_matrix[h,h] != (8 - valence_electrons$valence_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input$Atom[[h]]))]) &
+          (8 - valence_electrons$valence_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input$Atom[[h]]))]) > 0 & as.character(saturated_skeleton$Atom[h]) != "H") {
+        adding_hydrogen <- adding_hydrogen + 1
+      }
+    }
+
+    for (l in 1:adding_hydrogen) {
+      saturated_skeleton[nrow(saturated_skeleton) +1,] = c("H", 0, 0, 0)
+    }
+
+    for (j in 1:nrow(Mol_mat$input)) {
+      Ztot_full[j] <- valence_electrons$Total_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input$Atom[[j]]))]
+      Zval_full[j] <- valence_electrons$valence_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input$Atom[[j]]))]
+      PN_full[j] <- valence_electrons$Principal_quantum_number[which(valence_electrons$Symbol == as.character(Mol_mat$input$Atom[[j]]))]
+      if (as.character(Mol_mat$input$Atom[j]) == "H") {
+        alpha_full[j] = 0
+      } else {
+        alpha_full[j] <- ((Ztot_full[j] - Zval_full[j])/Zval_full[j])*(1/(PN_full[j] - 1))
+      }
+
+      epsilon_full[j] <- -alpha_full[j] +0.3*Zval_full[j]
+    }
+
+    for (j in 1:nrow(saturated_skeleton)) {
+      Ztot_sat[j] <- valence_electrons$Total_electrons[which(valence_electrons$Symbol == as.character(saturated_skeleton$Atom[[j]]))]
+      Zval_sat[j] <- valence_electrons$valence_electrons[which(valence_electrons$Symbol == as.character(saturated_skeleton$Atom[[j]]))]
+      PN_sat[j] <- valence_electrons$Principal_quantum_number[which(valence_electrons$Symbol == as.character(saturated_skeleton$Atom[[j]]))]
+
+      if (as.character(saturated_skeleton$Atom[j]) == "H") {
+        alpha_sat[j] = 0
+      } else {
+        alpha_sat[j] <- ((Ztot_sat - Zval_sat[j])/Zval_sat[j])*(1/(PN_sat[j] - 1))
+      }
+      epsilon_sat[j] <- -alpha_sat[j] +0.3*Zval_sat[j]
     }
 
 
-    for (k in 1:length(Zval)) {
-      d[k] <- ((Ztot[k] - Zval[k])/Zval[k])*(1/(PN[k] - 1))
+    hydrogen_to_heteroatom <- 0
+
+    for (i in 1:nrow(Mol_mat$graph_Vadj_matrix_full)) {
+      if (as.character(Mol_mat$input$Atom[[i]]) == "H") {
+        for (j in 1:ncol(Mol_mat$graph_Vadj_matrix_full)) {
+          if (Mol_mat$graph_Vadj_matrix_full[i,j] == 1 & as.character(Mol_mat$input$Atom[[j]]) != "C" ) {
+            hydrogen_to_heteroatom <- hydrogen_to_heteroatom + 1
+          }
+        }
+      }
     }
 
-    total_bulk <- sum(d)
 
-    Output_descp$Bulk_index = total_bulk
+    total_bulk <- sum(alpha)
+    total_bulkR <- sum(alphaR)
 
-    message("Bulk index ... OK")
+    dalphaA <- (total_bulk - total_bulkR)/nrow(Mol_mat$input_H_suppressed)
+    dalphaB <- (total_bulkR - total_bulk)/nrow(Mol_mat$input_H_suppressed)
+
+    epsilon2 <- sum(epsilon)/nrow(Mol_mat$input_H_suppressed)
+    epsilon3 <- sum(epsilonR)/nrow(Mol_mat$input_H_suppressed)
+    epsilon1 <- sum(epsilon_full)/nrow(Mol_mat$input)
+    epsilon4 <- sum(epsilon_sat)/nrow(saturated_skeleton)
+    epsilon5 <- (sum(epsilon) + hydrogen_to_heteroatom*(0.3))/(nrow(Mol_mat$input_H_suppressed) + hydrogen_to_heteroatom)
+
+    depsilonA <- epsilon1 - epsilon3
+    depsilonB <- epsilon1 - epsilon4
+    depsilonC <- epsilon3 - epsilon4
+    depsilonD <- epsilon2 - epsilon5
+
+
+    Output_descp$Bulk_index <- total_bulk
+    Output_descp$dalphaA <- dalphaA
+    Output_descp$dalphaB <- dalphaB
+    Output_descp$epsilon1 <- epsilon1
+    Output_descp$epsilon2 <- epsilon2
+    Output_descp$epsilon3 <- epsilon3
+    Output_descp$epsilon4 <- epsilon4
+    Output_descp$epsilon5 <- epsilon5
+    Output_descp$depsilonA <- depsilonA
+    Output_descp$depsilonB <- depsilonB
+    Output_descp$depsilonC <- depsilonC
+    Output_descp$depsilonD <- depsilonD
+
+    message("ETA indexes ... OK")
   } else {
-    message("Bulk index ... FAIL")
+    message("ETA indexes ... FAIL")
   }
 }
 
@@ -464,6 +597,8 @@ Hydro_factor_calc <- function(){
   }
 
 }
+
+
 
 
 #' Moleculors Unsaturation Index
@@ -534,8 +669,11 @@ Unsaturation_index_calc <- function() {
 #' @examples
 #' Unsaturation_index_calc()
 #'
-#' @export
 #'
+#'
+#'
+
+# function under development
 
 MED_index_calc <- function(){
   if (is.data.frame(Mol_mat$input) & is.matrix(Mol_mat$graph_Vlaplacian_full_matrix) &

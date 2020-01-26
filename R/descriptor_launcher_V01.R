@@ -36,11 +36,10 @@ descriptor_launcher = function(){
 
     E_state()
 
-    Bulk_index_calc()
+    Bulk_Electronegativity_indexes_calc()
 
     Hydro_factor_calc()
 
-    MED_index_calc()
 
     Data_summary <- data.frame(1)
 
