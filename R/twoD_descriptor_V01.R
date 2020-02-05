@@ -465,6 +465,7 @@ Bulk_Electronegativity_indexes_calc <- function() {
 
 
     saturated_skeleton <- Mol_mat$input
+    levels(saturated_skeleton$Atom) = c(levels(saturated_skeleton$Atom),"H")
     adding_hydrogen <- 0
 
     for (h in 1:nrow(saturated_skeleton)) {
@@ -499,7 +500,7 @@ Bulk_Electronegativity_indexes_calc <- function() {
       if (as.character(saturated_skeleton$Atom[j]) == "H") {
         alpha_sat[j] = 0
       } else {
-        alpha_sat[j] <- ((Ztot_sat - Zval_sat[j])/Zval_sat[j])*(1/(PN_sat[j] - 1))
+        alpha_sat[j] <- ((Ztot_sat[j] - Zval_sat[j])/Zval_sat[j])*(1/(PN_sat[j] - 1))
       }
       epsilon_sat[j] <- -alpha_sat[j] +0.3*Zval_sat[j]
     }
