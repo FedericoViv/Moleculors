@@ -364,6 +364,7 @@ E_state <- function() {
     }
 
     Output_descp$total_Estate_index = total_Estate
+    Output_descp$mean_Estate <- sum(intrinsic_state)/nrow(Mol_mat$graph_Vadj_matrix)
 
     message("E-state index ... OK")
   } else {
@@ -753,3 +754,4 @@ MED_index_calc <- function(){
     message("mED index ... FAIL")
   }
 }
+
