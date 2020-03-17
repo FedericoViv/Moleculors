@@ -151,7 +151,7 @@ Vadj_matrix = function(Cart_Input_Hsupp){
 
   for (i in 1:nrow(graph_Vadj_matrix)) {
     for (j in 1:nrow(graph_Vadj_matrix)) {
-      if ((graph_Vadj_matrix[i,j] - min(graph_Vadj_matrix[i,-i])) <= 0.52 & i != j & j > i) {
+      if ((graph_Vadj_matrix[i,j] - min(graph_Vadj_matrix[i,-i])) <= 0.58 & i != j & j > i) {
         graph_Vadj_matrix[i,j] = min(graph_Vadj_matrix[i,-i])
       }
     }
@@ -350,7 +350,7 @@ Eadj_matrix = function(Cart_Input_Hsupp){
 
     for (i in 1:nrow(graph_Eadj_matrix)) {
       for (j in 1:nrow(graph_Eadj_matrix)) {
-        if ((graph_Eadj_matrix[i,j] - min(graph_Eadj_matrix[i,-i])) <= 0.52 & i != j & j > i) {
+        if ((graph_Eadj_matrix[i,j] - min(graph_Eadj_matrix[i,-i])) <= 0.58 & i != j & j > i) {
           graph_Eadj_matrix[i,j] = min(graph_Eadj_matrix[i,-i])
         }
       }
@@ -1083,7 +1083,7 @@ Vadj_matrix_full = function(full_input){
 
   for (i in 1:nrow(graph_Vadj_matrix_full)) {
     for (j in 1:nrow(graph_Vadj_matrix_full)) {
-      if ((graph_Vadj_matrix_full[i,j] - min(graph_Vadj_matrix_full[i,-i])) <= 0.52 & i != j & j > i) {
+      if ((graph_Vadj_matrix_full[i,j] - min(graph_Vadj_matrix_full[i,-i])) <= 0.58 & i != j & j > i) {
         graph_Vadj_matrix_full[i,j] = min(graph_Vadj_matrix_full[i,-i])
       }
     }
@@ -1180,7 +1180,7 @@ Eadj_matrix_full = function(Cart_Input){
 
     for (i in 1:nrow(graph_Eadj_matrix)) {
       for (j in 1:nrow(graph_Eadj_matrix)) {
-        if ((graph_Eadj_matrix[i,j] - min(graph_Eadj_matrix[i,-i])) <= 0.52 & i != j & j > i) {
+        if ((graph_Eadj_matrix[i,j] - min(graph_Eadj_matrix[i,-i])) <= 0.58 & i != j & j > i) {
           graph_Eadj_matrix[i,j] = min(graph_Eadj_matrix[i,-i])
         }
       }
