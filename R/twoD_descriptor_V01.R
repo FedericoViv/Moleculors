@@ -430,7 +430,7 @@ Bulk_Electronegativity_indexes_calc <- function() {
 
     for (i in 1:nrow(reference_alcane)){
       if (reference_alcane$Atom[i] != "C" ) {
-        reference_alcane[i] = "C"
+        reference_alcane$Atom[i] = "C"
       }
     }
 
