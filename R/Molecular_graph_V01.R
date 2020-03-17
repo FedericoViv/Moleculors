@@ -151,7 +151,7 @@ Vadj_matrix = function(Cart_Input_Hsupp){
 
   for (i in 1:nrow(graph_Vadj_matrix)) {
     for (j in 1:nrow(graph_Vadj_matrix)) {
-      if ((graph_Vadj_matrix[i,j] - min(graph_Vadj_matrix[i,-i])) <= 0.5 & i != j & j > i) {
+      if ((graph_Vadj_matrix[i,j] - min(graph_Vadj_matrix[i,-i])) <= 0.52 & i != j & j > i) {
         graph_Vadj_matrix[i,j] = min(graph_Vadj_matrix[i,-i])
       }
     }
@@ -224,10 +224,10 @@ Vdistance_matrix = function(){
           graph_Vdistance_matrix[i,j] = 0
         } else if (i != j & Mol_mat$graph_Vadj_matrix[i,j] == 0) {
           connection_vector = connections[[i]]
-          while (!(j %in% connection_vector)) {
+          while (!(j %in% unique(connection_vector))) {
             connections_holder = c()
-            for (k in 1:length(connection_vector)) {
-              connections_holder = append(connections_holder, connections[[connection_vector[k]]])
+            for (k in 1:length(unique(connection_vector))) {
+              connections_holder = append(connections_holder, connections[[unique(connection_vector)[k]]])
             }
             d = d + 1
             connection_vector = connections_holder
@@ -350,7 +350,7 @@ Eadj_matrix = function(Cart_Input_Hsupp){
 
     for (i in 1:nrow(graph_Eadj_matrix)) {
       for (j in 1:nrow(graph_Eadj_matrix)) {
-        if ((graph_Eadj_matrix[i,j] - min(graph_Eadj_matrix[i,-i])) <= 0.5 & i != j & j > i) {
+        if ((graph_Eadj_matrix[i,j] - min(graph_Eadj_matrix[i,-i])) <= 0.52 & i != j & j > i) {
           graph_Eadj_matrix[i,j] = min(graph_Eadj_matrix[i,-i])
         }
       }
@@ -1083,7 +1083,7 @@ Vadj_matrix_full = function(full_input){
 
   for (i in 1:nrow(graph_Vadj_matrix_full)) {
     for (j in 1:nrow(graph_Vadj_matrix_full)) {
-      if ((graph_Vadj_matrix_full[i,j] - min(graph_Vadj_matrix_full[i,-i])) <= 0.5 & i != j & j > i) {
+      if ((graph_Vadj_matrix_full[i,j] - min(graph_Vadj_matrix_full[i,-i])) <= 0.52 & i != j & j > i) {
         graph_Vadj_matrix_full[i,j] = min(graph_Vadj_matrix_full[i,-i])
       }
     }
@@ -1180,7 +1180,7 @@ Eadj_matrix_full = function(Cart_Input){
 
     for (i in 1:nrow(graph_Eadj_matrix)) {
       for (j in 1:nrow(graph_Eadj_matrix)) {
-        if ((graph_Eadj_matrix[i,j] - min(graph_Eadj_matrix[i,-i])) <= 0.5 & i != j & j > i) {
+        if ((graph_Eadj_matrix[i,j] - min(graph_Eadj_matrix[i,-i])) <= 0.52 & i != j & j > i) {
           graph_Eadj_matrix[i,j] = min(graph_Eadj_matrix[i,-i])
         }
       }
