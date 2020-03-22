@@ -1259,6 +1259,47 @@ Laplacian_Vdistance_full = function(){
 ########################################TO BE IMPLEMENTED ################################
 
 
+#' Moleculors csi vertex matrix
+#'
+#' This function return the csi vertex matrix for the selected molecule
+#' it take as input the Vadj_matrix, the laplacian_Vertex matrix and the Vdistance matrix
+#'  and for each element return wij = "di x dk... x dj"^-1/2 where di is the vertex degree
+#'  of the element i in the shorter path di-dj. By definition wij with i=j will be 0
+#'
+#'
+#' @return Csi vertex matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Csi_V_matrix()
+#'
+#' @export
+#'
+
+
+Csi_V_matrix = function(){
+
+  if (is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Vlaplacian_matrix) & is.matrix(Mol_mat$graph_Vdistance_matrix)) {
+    graph_Vcsi_matrix = matrix(nrow = nrow(Mol_mat$graph_Vadj_matrix), ncol = nrow(Mol_mat$graph_Vadj_matrix))
+    for (i in 1:nrow(Mol_mat$graph_Vadj_matrix_full)) {
+      for (j in 1:nrow(Mol_mat$graph_Vadj_matrix_full)) {
+        if (Mol_mat$graph_Vadj_matrix_full[i,j] == 1) {
+          graph_Vlaplacian_matrix[i,j] = - 1
+        } else if (i == j){
+          graph_Vlaplacian_matrix[i,j] = sum(Mol_mat$graph_Vadj_matrix_full[i,] == 1)
+        } else {
+          graph_Vlaplacian_matrix[i,j] = 0
+        }
+      }
+    }
+
+    Mol_mat$graph_Vcsi_matrix = graph_Vcsi_matrix
+    message("Csi vertex matrix ... OK")
+  } else {
+    message("Csi vertex matrix ... FAIL")
+  }
+}
+
+
 # This function return the detour vertex matrix, which contain the longest
 # distance between two vertexes.
 

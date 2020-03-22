@@ -601,6 +601,76 @@ Hydro_factor_calc <- function(){
 }
 
 
+#' Moleculors eccentric connectivity index
+#'
+#' This function define the eccentric connectivity index of the input molecule as:
+#' Ec_index = sum"csii*sigmai" where csii is the max topological distance from the atom
+#' i and sigmai is is vertex degree
+#'
+#' @return eccentric connectivity index for the input molecule. Value is stored in Ouput_descp environment.
+#'
+#' @examples
+#' Ec_index_calc()
+#'
+#' @export
+#'
+
+Ec_index_calc() <- function(){
+  if (is.matrix(Mol_mat$graph_Vdistance_matrix) & is.matrix(Mol_mat$graph_Vlaplacian_matrix)) {
+    csi <- 0
+    sigma <- 0
+    Ec <- 0
+
+    for (i in 1:nrow(Mol_mat$graph_Vdistance_matrix)) {
+      csi <- max(Mol_mat$graph_Vdistance_matrix[i,])
+      sigma <- Mol_mat$graph_Vlaplacian_matrix[i,i]
+      Ec <- Ec + csi*sigma
+    }
+    Output_descp$Ec_index <- Ec
+    message("Eccentric connectivity index ... OK")
+  } else {
+    message("Eccentric connectivity index... FAIL")
+  }
+}
+
+#' Moleculors adj matrix eigenvalues descriptors
+#'
+#' This function define several descriptors from the eigenvalue of the adjmatrix:
+#' Epi represents the energy of the energy of the pi electrons of the molecule. It is define as the
+#' summatory of the eigenvalue i times the occupation number of the MO i, this can be 0,1 or 2. Since usually
+#' the orbital contains 2 electrons when the eigenvalue is positive and 0 when negative. We can redefine the Epi
+#' value as the summatory of the absolute value of the eigenvalue. Since the number of eigenvalues is equal to the number of
+#' atoms in the H depleted matrxi, if the number is ODD we will have 1 occupation number, this is automatically taken into account
+#' when adding the absolute values. e.g. Epi = 2 x +y1 + 2 x +y2 + 1 x +y3 + 0 x -y4 0 x -y5
+#' LEDM "leading value of distance matrix" represent the max value of the eigenvalue of the Vdistance matrix.
+#' This descriptor can be a discriminant of molecules size in molecules series.
+#' @return eigenvalues descriptors for the input molecule. Value is stored in Ouput_descp environment.
+#'
+#' @examples
+#' eigenvalues_descp_cacl()
+#'
+#' @export
+#'
+
+eigenvalues_descp_cacl <- function(){
+  if (is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Vdistance_matrix)) {
+    eigenvalues_Vadj <- eigen(Mol_mat$graph_Vadj_matrix)$values
+    if (round(sum(eigenvalues_Vadj)) = 0) {
+      Epi <- sum(abs(eigenvalues_Vadj))
+    } else {
+      Epi <- NA
+      message("Anormalities in pi energies calculation. Probable non equal distribution in molecular orbitals electrons")
+    }
+    eigenvalues_Vdist <- eigen(Mol_mat$graph_Vdistance_matrix)$values
+    LEDM <- max(eigenvalues_Vdist)
+
+    Output_descp$Epi_index <- Epi
+    Output_descp$LEDM_index <- LEDM
+    message("Eigenvalues indexes... OK")
+  } else {
+    message("Eigenvalues indexes... FAIL")
+  }
+}
 
 
 #' Moleculors Unsaturation Index
