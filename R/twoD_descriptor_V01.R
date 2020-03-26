@@ -644,6 +644,12 @@ Ec_index_calc() <- function(){
 #' when adding the absolute values. e.g. Epi = 2 x +y1 + 2 x +y2 + 1 x +y3 + 0 x -y4 0 x -y5
 #' LEDM "leading value of distance matrix" represent the max value of the eigenvalue of the Vdistance matrix.
 #' This descriptor can be a discriminant of molecules size in molecules series.
+#' Sparse CRI "characteristic root index" represent the sum of the positive eigenvalues of the sparse csi
+#' matrix. Such value is sensitive to the presence of heteroatoms in the molecule.
+#' Extadj_Vdegree_index and Extadj_Vdegree_max_index represent respectively the sum of the eigenvalues and the
+#' maximum value of the eigenvalues of the extended Vadj matrix for vertex degree. This descriptors are
+#' usually well correlated with physico-chemical properties and biological activities of organic compounds.
+#'
 #' @return eigenvalues descriptors for the input molecule. Value is stored in Ouput_descp environment.
 #'
 #' @examples
@@ -664,8 +670,20 @@ eigenvalues_descp_cacl <- function(){
     eigenvalues_Vdist <- eigen(Mol_mat$graph_Vdistance_matrix)$values
     LEDM <- max(eigenvalues_Vdist)
 
+    eigenvalues_Vsparcecsi <- eigen(Mol_mat$graph_Vsparsecsi_matrix)$value
+    eigenvalues_Vsparcecsi <- eigenvalues_Vsparcecsi[which(eigenvalues_Vsparcecsi > 0)]
+    sparse_CRI <- sum(eigenvalues_Vsparcecsi)
+
+
+    eigenvalues_extendedVadj_degree <- eigen(Mol_mat$graph_Extended_Vadj_degree_matrix)
+    Extadj_Vdegree <- sum(abs(eigenvalues_extendedVadj_degree$values))
+    Extadj_Vdegree_max <- max(abs(eigenvalues_extendedVadj_degree$values))
+
     Output_descp$Epi_index <- Epi
     Output_descp$LEDM_index <- LEDM
+    Output_descp$sparse_CRI_index <- sparse_CRI
+    Output_descp$Extadj_Vdegree_index <- Extadj_Vdegree
+    Output_descp$Extadj_Vdegree_max_index <- Extadj_Vdegree_max
     message("Eigenvalues indexes... OK")
   } else {
     message("Eigenvalues indexes... FAIL")

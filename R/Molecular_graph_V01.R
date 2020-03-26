@@ -95,6 +95,10 @@ graphical_matrix = function(){
 
     Vadj_highpower_matrix(2)
 
+    Sparse_csi_V_matrix()
+
+    Extended_Vadj_matrix_Vdegrees()
+
 
 
   } else {
@@ -1255,6 +1259,83 @@ Laplacian_Vdistance_full = function(){
 }
 
 
+#' Moleculors sparse csi vertex matrix
+#'
+#' This function return the sparse csi vertex matrix for the selected molecule
+#' it take as input the Vadj_matrix, the laplacian_Vertex matrix and the Vdistance matrix
+#'  and for each element return wij = "di x dj"^-1/2 where di is the vertex degree
+#'  of the element i. By definition wij with i=j will be 0
+#'
+#'
+#' @return sparse Csi vertex matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Sparse_csi_V_matrix()
+#'
+#' @export
+#'
+
+
+Sparse_csi_V_matrix <- function(){
+
+  if (is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Vlaplacian_matrix) & is.matrix(Mol_mat$graph_Vdistance_matrix)) {
+    graph_Vsparsecsi_matrix = matrix(nrow = nrow(Mol_mat$graph_Vadj_matrix), ncol = nrow(Mol_mat$graph_Vadj_matrix))
+
+
+    for (i in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
+      for (j in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
+        if (i == j) {
+          graph_Vsparsecsi_matrix[i,j] = 0
+        } else {
+
+          graph_Vsparsecsi_matrix[i,j] = 1/sqrt(Mol_mat$graph_Vlaplacian_matrix[i,i]*Mol_mat$graph_Vlaplacian_matrix[j,j])
+        }
+      }
+    }
+
+    Mol_mat$graph_Vsparsecsi_matrix = graph_Vsparsecsi_matrix
+    message("sparse Csi vertex matrix ... OK")
+  } else {
+    message("sparse Csi vertex matrix ... FAIL")
+  }
+}
+
+
+#' Moleculors extended adjacency matrix from vertex degrees
+#'
+#' This function return the extended adjacency matrix taking into account the
+#' effect of vertexes degrees.
+#' it take as input the Vadj_matrix, the laplacian_Vertex matrix
+#' and for each element return a'ij = ai * 'di/dj + dj/di'/2 where di is the vertex degree
+#' of the element i. By definition a'ij with i=j will be 0
+#'
+#'
+#' @return extended adjacency matrix from vertex degree for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Extended_Vadj_matrix_Vdegrees()
+#'
+#' @export
+#'
+
+Extended_Vadj_matrix_Vdegrees <- function(){
+  if (is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Vlaplacian_matrix)){
+
+    Extended_Vadj_degree <- Mol_mat$graph_Vadj_matrix
+
+    for (i in 1:nrow(Extended_Vadj_degree)) {
+      for (j in 1:nrow(Extended_Vadj_degree)) {
+        Extended_Vadj_degree[i,j] = Mol_mat$graph_Vadj_matrix[i,j]*((Mol_mat$graph_Vlaplacian_matrix[i,i]/Mol_mat$graph_Vlaplacian_matrix[j,j]) +
+                                                                      (Mol_mat$graph_Vlaplacian_matrix[j,j]/Mol_mat$graph_Vlaplacian_matrix[i,i]))/2
+      }
+    }
+
+    Mol_mat$graph_Extended_Vadj_degree_matrix = Extended_Vadj_degree
+    message("Extended Vadj vertex degree matrix ... OK")
+  } else {
+    message("Extended Vadj vertex degree matrix ... FAIL")
+  }
+}
 
 ########################################TO BE IMPLEMENTED ################################
 
@@ -1280,14 +1361,23 @@ Csi_V_matrix = function(){
 
   if (is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Vlaplacian_matrix) & is.matrix(Mol_mat$graph_Vdistance_matrix)) {
     graph_Vcsi_matrix = matrix(nrow = nrow(Mol_mat$graph_Vadj_matrix), ncol = nrow(Mol_mat$graph_Vadj_matrix))
-    for (i in 1:nrow(Mol_mat$graph_Vadj_matrix_full)) {
-      for (j in 1:nrow(Mol_mat$graph_Vadj_matrix_full)) {
-        if (Mol_mat$graph_Vadj_matrix_full[i,j] == 1) {
-          graph_Vlaplacian_matrix[i,j] = - 1
-        } else if (i == j){
-          graph_Vlaplacian_matrix[i,j] = sum(Mol_mat$graph_Vadj_matrix_full[i,] == 1)
+
+    wij = 1
+
+    for (i in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
+      for (j in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
+        if (i == j) {
+          graph_Vcsi_matrix[i,j] = 0
         } else {
-          graph_Vlaplacian_matrix[i,j] = 0
+          wij = 1
+          for (h in Mol_mat$graph_Vdistance_matrix[i,j]:1) {
+            if (h == 1 & Mol_mat$graph_Vdistance_matrix[i,j] == 1) {
+              wij = wij * Mol_mat$graph_Vlaplacian_matrix[j,j]
+            } else {
+              wij = wij * Mol_mat$graph_Vlaplacian_matrix[which(Mol_mat$graph_Vdistance_matrix[i,] == h & Mol_mat$graph_Vadj_matrix[i,]), which(Mol_mat$graph_Vadj_matrix[i,] == h)]
+            }
+          }
+          graph_Vcsi_matrix[i,j] = 1/sqrt(Mol_mat$graph_Vlaplacian_matrix[i,i] * wij)
         }
       }
     }
@@ -1360,3 +1450,4 @@ Detour_Distance_Vdistance = function(Vdistance_matrix, detour_Vdistance_matrix){
 Detour_Distance_Edistance = function(Edistance_matrix, detour_Edistance_matrix){
 
 }
+
