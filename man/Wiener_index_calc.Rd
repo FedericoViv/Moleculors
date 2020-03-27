@@ -2,7 +2,7 @@
 % Please edit documentation in R/twoD_descriptor_V01.R
 \name{Wiener_index_calc}
 \alias{Wiener_index_calc}
-\title{Moleculors Weiner index calculator}
+\title{Moleculors Weiner indexes calculator}
 \usage{
 Wiener_index_calc()
 }
@@ -10,9 +10,15 @@ Wiener_index_calc()
 Weiner index. Value is stored in Ouput_descp environment.
 }
 \description{
-This function take as input the vertex distance graphical matrix and return the Wiener Index
-this index is calculated as half of the summatory of the summatory of the distances in each
-row of the graphical matrix
+This function take as input the vertex distance graphical matrix and the V distance distance matrix
+and return the Wiener Indexes calculated from both
+Wiener index is calculated as half of the summatory of the summatory of the distances in each
+row of the graphical matrix.
+average distance distance degree is calculated as the summatory of the summatory of the distances in each
+row of the distance distance graphical matrix divided by the number of atoms.
+D/D index is the defined as half of the summatory of the summatory of the distances in each
+row of the graphical distance distance matrix. This last two give informations about
+molecule folding.
 }
 \examples{
 Wiener_index_calc()
