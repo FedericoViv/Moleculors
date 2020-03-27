@@ -487,6 +487,9 @@ Bulk_Electronegativity_indexes_calc <- function() {
     adding_hydrogen <- 0
 
     for (h in 1:nrow(saturated_skeleton)) {
+      if (!(Mol_mat$input$Atom[i] %in% c("C", "H"))) {
+        saturated_skeleton$Atom[i] = "C"
+      }
       if (Mol_mat$graph_Vlaplacian_full_matrix[h,h] != 4 & as.character(saturated_skeleton$Atom[h]) != "H") {
         adding_hydrogen <- adding_hydrogen + 4 - Mol_mat$graph_Vlaplacian_full_matrix[h,h]
       }
