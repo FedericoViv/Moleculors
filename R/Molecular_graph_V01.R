@@ -99,6 +99,10 @@ graphical_matrix = function(){
 
     Extended_Vadj_matrix_Vdegrees()
 
+    Extended_Vadj_matrix_Veln()
+
+    Vdistance_distance_matrix()
+
 
 
   } else {
@@ -1337,7 +1341,108 @@ Extended_Vadj_matrix_Vdegrees <- function(){
   }
 }
 
+
+
+#' Moleculors extended adjacency matrix from vertex electronegativity
+#'
+#' This function return the extended adjacency matrix taking into account the
+#' effect of vertexes electronegativity.
+#' it take as input the Vadj_matrix, the laplacian_Vertex matrix
+#' and for each element return a'ij = ai * 'di''/dj'' + dj''/di''/2 where di'' is the vertex degree
+#' of the element i multiplied by its electronegativity elni. By definition a'ij with i=j will be elni
+#'
+#'
+#' @return extended adjacency matrix from vertex electronegativity for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Extended_Vadj_matrix_Veln()
+#'
+#' @export
+#'
+
+Extended_Vadj_matrix_Veln <- function(){
+  if (is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Vlaplacian_matrix) & is.data.frame(Mol_mat$input_H_suppressed)){
+
+    Extended_Vadj_eln <- Mol_mat$graph_Vadj_matrix
+    eln_table <- read.csv("tables/electronegativity_table.csv", sep = ";")
+
+    for (i in 1:nrow(Extended_Vadj_eln)) {
+      for (j in 1:nrow(Extended_Vadj_eln)) {
+        if (i == j) {
+          Extended_Vadj_eln[i,j] = eln_table$Eln[which(eln_table$Atom == as.character(Mol_mat$input_H_suppressed$Atom[[i]]))]
+        } else {
+          Extended_Vadj_eln[i,j] = Mol_mat$graph_Vadj_matrix[i,j]*(((Mol_mat$graph_Vlaplacian_matrix[i,i]*eln_table$Eln[which(eln_table$Atom == as.character(Mol_mat$input_H_suppressed$Atom[[i]]))])/(Mol_mat$graph_Vlaplacian_matrix[j,j]*eln_table$Eln[which(eln_table$Atom == as.character(Mol_mat$input_H_suppressed$Atom[[j]]))])) +
+                                                                        ((Mol_mat$graph_Vlaplacian_matrix[j,j]*eln_table$Eln[which(eln_table$Atom == as.character(Mol_mat$input_H_suppressed$Atom[[j]]))])/(Mol_mat$graph_Vlaplacian_matrix[i,i]*eln_table$Eln[which(eln_table$Atom == as.character(Mol_mat$input_H_suppressed$Atom[[i]]))])))/2
+        }
+      }
+    }
+
+    Mol_mat$graph_Extended_Vadj_eln_matrix = Extended_Vadj_eln
+    message("Extended Vadj vertex electronegativity matrix ... OK")
+  } else {
+    message("Extended Vadj vertex electronegativity matrix ... FAIL")
+  }
+}
+
+
+#' Moleculors Vdistance/distance matrix
+#'
+#' This function return the Vdistance/distance matrix for the selected molecule
+#' it takes as input the Vdistance matrix, compute the geometrical distance matrix for each element ij
+#' and for each element return ddij = geomij/distanceij
+#'
+#'
+#' @return distance/distance matrix for the loaded molecule. Matrix is stored in Mol_mat environment.
+#'
+#' @examples
+#' Vdistance_distance_matrix()
+#'
+#' @export
+#'
+
+Vdistance_distance_matrix <- function(){
+  if (is.matrix(Mol_mat$graph_Vdistance_matrix) & is.data.frame(Mol_mat$input_H_suppressed)){
+
+    Vdistance_distance = Mol_mat$graph_Vdistance_matrix
+
+    geom_matrix = matrix(nrow = nrow(Mol_mat$input_H_suppressed), ncol = nrow(Mol_mat$input_H_suppressed))
+
+    for (i in 1:nrow(geom_matrix)) {
+
+      for (j in 1:ncol(geom_matrix)) {
+
+        geom_matrix[i,j] = sqrt((Mol_mat$input_H_suppressed$X[j] - Mol_mat$input_H_suppressed$X[i])^2 +
+                                  (Mol_mat$input_H_suppressed$Y[j] - Mol_mat$input_H_suppressed$Y[i])^2 +
+                                  (Mol_mat$input_H_suppressed$Z[j] - Mol_mat$input_H_suppressed$Z[i])^2)
+
+      }
+    }
+
+
+    for (i in 1:nrow(Vdistance_distance)) {
+      for (j in 1:nrow(Vdistance_distance)) {
+        if (i != j) {
+          Vdistance_distance[i,j] = geom_matrix[i,j]/Mol_mat$graph_Vdistance_matrix[i,j]
+        }
+      }
+    }
+
+    Mol_mat$graph_Vdistance_distance_matrix = Vdistance_distance
+    message("Vertex distance/distance matrix ... OK")
+  } else {
+    message("Vertex distance/distance matrix matrix ... FAIL")
+  }
+}
+
+
+
+
+
+
 ########################################TO BE IMPLEMENTED ################################
+
+
+
 
 
 #' Moleculors csi vertex matrix

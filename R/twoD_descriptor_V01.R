@@ -3,11 +3,17 @@
 # Each molecular descriptor will be saved in the Output_descp environment for future call
 
 
-#' Moleculors Weiner index calculator
+#' Moleculors Weiner indexes calculator
 #'
-#' This function take as input the vertex distance graphical matrix and return the Wiener Index
-#' this index is calculated as half of the summatory of the summatory of the distances in each
-#' row of the graphical matrix
+#' This function take as input the vertex distance graphical matrix and the V distance distance matrix
+#' and return the Wiener Indexes calculated from both
+#' Wiener index is calculated as half of the summatory of the summatory of the distances in each
+#' row of the graphical matrix.
+#' average distance distance degree is calculated as the summatory of the summatory of the distances in each
+#' row of the distance distance graphical matrix divided by the number of atoms.
+#' D/D index is the defined as half of the summatory of the summatory of the distances in each
+#' row of the graphical distance distance matrix. This last two give informations about
+#' molecule folding.
 #'
 #'
 #' @return Weiner index. Value is stored in Ouput_descp environment.
@@ -21,7 +27,7 @@
 
 Wiener_index_calc = function(){
 
-  if (is.matrix(Mol_mat$graph_Vdistance_matrix)) {
+  if (is.matrix(Mol_mat$graph_Vdistance_matrix) & is.matrix(Mol_mat$graph_Vdistance_distance_matrix)) {
 
     W = 0
 
@@ -31,12 +37,23 @@ Wiener_index_calc = function(){
 
     }
 
-    Output_descp$W_index = 0.5 * W
+    ADDD = 0
 
-    message("Wiener index ... OK")
+    for (i in 1:nrow(Mol_mat$graph_Vdistance_distance_matrix)) {
+
+      ADDD = ADDD + sum(Mol_mat$graph_Vdistance_distance_matrix[i,])
+
+    }
+
+
+    Output_descp$W_index = 0.5 * W
+    Output_descp$ADDD_index = ADDD/nrow(Mol_mat$graph_Vdistance_distance_matrix)
+    Output_descp$D_D_index = 0.5 * ADDD
+
+    message("Wiener indexes ... OK")
 
   } else {
-    message("Wiener index ... FAIL")
+    message("Wiener indexes ... FAIL")
   }
 }
 
@@ -649,7 +666,10 @@ Ec_index_calc() <- function(){
 #' Extadj_Vdegree_index and Extadj_Vdegree_max_index represent respectively the sum of the eigenvalues and the
 #' maximum value of the eigenvalues of the extended Vadj matrix for vertex degree. This descriptors are
 #' usually well correlated with physico-chemical properties and biological activities of organic compounds.
-#'
+#' Extadj_Veln_index and Extadj_Veln_max_index represent respectively the sum of the eigenvalues and the
+#' maximum value of the eigenvalues of the extended Vadj matrix for vertex electronegativity. This descriptors are
+#' usually well correlated with physico-chemical properties and biological activities of organic compounds and affected by
+#' the presence of heteroatoms.
 #' @return eigenvalues descriptors for the input molecule. Value is stored in Ouput_descp environment.
 #'
 #' @examples
@@ -659,7 +679,9 @@ Ec_index_calc() <- function(){
 #'
 
 eigenvalues_descp_cacl <- function(){
-  if (is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Vdistance_matrix)) {
+  if (is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Vdistance_matrix) &
+      is.matrix(Mol_mat$graph_Vsparsecsi_matrix) & is.matrix(Mol_mat$graph_Extended_Vadj_degree_matrix) &
+      is.matrix(Mol_mat$graph_Extended_Vadj_eln_matrix) & is.matrix(Mol_mat$graph_Vdistance_distance_matrix)) {
     eigenvalues_Vadj <- eigen(Mol_mat$graph_Vadj_matrix)$values
     if (round(sum(eigenvalues_Vadj)) = 0) {
       Epi <- sum(abs(eigenvalues_Vadj))
@@ -679,17 +701,32 @@ eigenvalues_descp_cacl <- function(){
     Extadj_Vdegree <- sum(abs(eigenvalues_extendedVadj_degree$values))
     Extadj_Vdegree_max <- max(abs(eigenvalues_extendedVadj_degree$values))
 
+    eigenvalues_extendedVadj_eln <- eigen(Mol_mat$graph_Extended_Vadj_eln_matrix)
+    Extadj_Veln <- sum(abs(eigenvalues_extendedVadj_eln$values))
+    Extadj_Veln_max <- max(abs(eigenvalues_extendedVadj_eln$values))
+
+    eigenvalues_distance_distance_matrix <- eigen(Mol_mat$graph_Vdistance_distance_matrix)
+    folding_degree <- max(eigenvalues_distance_distance_matrix$values)/nrow(Mol_mat$graph_Vdistance_distance_matrix)
+
+
     Output_descp$Epi_index <- Epi
     Output_descp$LEDM_index <- LEDM
     Output_descp$sparse_CRI_index <- sparse_CRI
     Output_descp$Extadj_Vdegree_index <- Extadj_Vdegree
     Output_descp$Extadj_Vdegree_max_index <- Extadj_Vdegree_max
+    Output_descp$Extadj_Veln_index <- Extadj_Veln
+    Output_descp$Extadj_Veln_max_index <- Extadj_Veln_max
+    Output_descp$folding_degree_index <- folding_degree
     message("Eigenvalues indexes... OK")
   } else {
     message("Eigenvalues indexes... FAIL")
   }
 }
 
+
+
+
+##########################TO BE IMPLEMENTED#####################
 
 #' Moleculors Unsaturation Index
 #'
@@ -705,6 +742,7 @@ eigenvalues_descp_cacl <- function(){
 #'
 #'
 #'
+
 
 ##### function under development
 
