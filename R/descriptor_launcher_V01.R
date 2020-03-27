@@ -42,6 +42,8 @@ descriptor_launcher = function(){
 
     eigenvalues_descp_cacl()
 
+    Q_polarity_calc()
+
 
     Data_summary <- data.frame(1)
 

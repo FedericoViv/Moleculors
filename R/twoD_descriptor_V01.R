@@ -487,9 +487,8 @@ Bulk_Electronegativity_indexes_calc <- function() {
     adding_hydrogen <- 0
 
     for (h in 1:nrow(saturated_skeleton)) {
-      if (Mol_mat$graph_Vlaplacian_full_matrix[h,h] != (8 - valence_electrons$valence_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input$Atom[[h]]))]) &
-          (8 - valence_electrons$valence_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input$Atom[[h]]))]) > 0 & as.character(saturated_skeleton$Atom[h]) != "H") {
-        adding_hydrogen <- adding_hydrogen + 1
+      if (Mol_mat$graph_Vlaplacian_full_matrix[h,h] != 4 & as.character(saturated_skeleton$Atom[h]) != "H") {
+        adding_hydrogen <- adding_hydrogen + 4 - Mol_mat$graph_Vlaplacian_full_matrix[h,h]
       }
     }
 
@@ -632,7 +631,7 @@ Hydro_factor_calc <- function(){
 #' @export
 #'
 
-Ec_index_calc() <- function(){
+Ec_index_calc <- function(){
   if (is.matrix(Mol_mat$graph_Vdistance_matrix) & is.matrix(Mol_mat$graph_Vlaplacian_matrix)) {
     csi <- 0
     sigma <- 0
@@ -682,8 +681,9 @@ eigenvalues_descp_cacl <- function(){
   if (is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Vdistance_matrix) &
       is.matrix(Mol_mat$graph_Vsparsecsi_matrix) & is.matrix(Mol_mat$graph_Extended_Vadj_degree_matrix) &
       is.matrix(Mol_mat$graph_Extended_Vadj_eln_matrix) & is.matrix(Mol_mat$graph_Vdistance_distance_matrix)) {
+
     eigenvalues_Vadj <- eigen(Mol_mat$graph_Vadj_matrix)$values
-    if (round(sum(eigenvalues_Vadj)) = 0) {
+    if (round(sum(eigenvalues_Vadj)) == 0) {
       Epi <- sum(abs(eigenvalues_Vadj))
     } else {
       Epi <- NA
@@ -722,6 +722,117 @@ eigenvalues_descp_cacl <- function(){
     message("Eigenvalues indexes... FAIL")
   }
 }
+
+
+#' Moleculors Q polarity index
+#'
+#' This function define the Q polarity index of the input molecule as:
+#' Q = ' A^2 sumIrefskeleton/sumI^2 '
+#' where A is the numbero of atoms in the H suppresed input, Irefskeleton is the
+#' intrinsic state of each atom in the reference alcane chain and I is the intrisic state
+#' in the actual molecule. Q lies between to boundary value, one of total polarity approximated
+#' by the square of the number of atoms A  and one of zero polarity given by the sp3 skeleton
+#'
+#'
+#' @return Q polarity index for the input molecule. Value is stored in Ouput_descp environment.
+#'
+#' @examples
+#' Q_polarity_calc()
+#'
+#' @export
+#'
+
+Q_polarity_calc <- function(){
+  if (is.matrix(Mol_mat$graph_Vadj_matrix) & is.matrix(Mol_mat$graph_Vadj_matrix_full) &
+      is.data.frame(Mol_mat$input) & is.data.frame(Mol_mat$input_H_suppressed) &
+      is.matrix(Mol_mat$graph_Vdistance_matrix) & is.matrix(Mol_mat$graph_Vlaplacian_matrix)) {
+
+    d = c()
+    Zval = c()
+    Ztot = c()
+    H = c()
+    intrinsic_state = c()
+    ref_intrinsic_state = c()
+    di = c(rep(0, nrow(Mol_mat$graph_Vadj_matrix)))
+
+    valence_electrons = read.csv("tables/valence_electrons_table.csv")
+
+    for (h in 1:nrow(Mol_mat$input)) {
+      if (Mol_mat$input$Atom[h] != "H") {
+        H[h] <- sum(length(intersect(which(Mol_mat$graph_Vadj_matrix_full[,h] == 1), which(Mol_mat$input$Atom == "H"))))
+      }
+    }
+
+    if (sum(is.na(H)) >= 1) {
+      H = H[- which(is.na(H))]
+    }
+
+    for (v in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
+      Ztot[v] <- valence_electrons$Total_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))]
+      Zval[v] <- valence_electrons$valence_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[v]]))]
+    }
+
+
+    for (k in 1:length(Zval)) {
+      d[k] <- (Zval[k] - H[k])/(Ztot[k] - Zval[k] - 1)
+    }
+
+
+    for (i in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
+      intrinsic_state[i] <- (((2/valence_electrons$Principal_quantum_number[which(valence_electrons$Symbol == as.character(Mol_mat$input_H_suppressed$Atom[[i]]))])^2) *
+                               d[i] + 1)/Mol_mat$graph_Vlaplacian_matrix[i,i]
+    }
+
+
+    saturated_skeleton <- Mol_mat$input
+    levels(saturated_skeleton$Atom) <- c(levels(saturated_skeleton$Atom),"H")
+
+
+    for (i in 1:nrow(saturated_skeleton)) {
+      if (!(Mol_mat$input$Atom[i] %in% c("C", "H"))) {
+        saturated_skeleton$Atom[i] = "C"
+      }
+      if (Mol_mat$graph_Vlaplacian_full_matrix[i,i] != 4 & as.character(saturated_skeleton$Atom[i]) != "H") {
+        H[i] <- H[i] + 4 - Mol_mat$graph_Vlaplacian_full_matrix[i,i]
+      }
+    }
+
+    for (h in 1:nrow(Mol_mat$input)) {
+      if (Mol_mat$input$Atom[h] != "H") {
+        H[h] <- H[h] + sum(length(intersect(which(Mol_mat$graph_Vadj_matrix_full[,h] == 1), which(Mol_mat$input$Atom == "H"))))
+      }
+    }
+
+    if (sum(is.na(H)) >= 1) {
+      H = H[- which(is.na(H))]
+    }
+
+    for (v in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
+      Ztot[v] <- valence_electrons$Total_electrons[which(valence_electrons$Symbol == "C")]
+      Zval[v] <- valence_electrons$valence_electrons[which(valence_electrons$Symbol == "C")]
+    }
+
+
+    for (k in 1:length(Zval)) {
+      d[k] <- (Zval[k] - H[k])/(Ztot[k] - Zval[k] - 1)
+    }
+
+
+    for (i in 1:nrow(Mol_mat$graph_Vadj_matrix)) {
+      ref_intrinsic_state[i] <- (((2/valence_electrons$Principal_quantum_number[which(valence_electrons$Symbol == "C")])^2) *
+                               d[i] + 1)/4
+    }
+
+
+
+    Output_descp$Q_polarity_index <- (nrow(Mol_mat$input_H_suppressed)^2)*sum(ref_intrinsic_state)/(sum(intrinsic_state)^2)
+
+    message("Q polarity index ... OK")
+  } else {
+    message("Q polarity index ... FAIL")
+  }
+}
+
 
 
 
