@@ -1,0 +1,130 @@
+#This source file contains all the necessary algebraic function in order to let the moleculors package works
+
+
+
+#' Moleculors Ones Matrix
+#'
+#' Generates a ixj matrix filled with ones
+#'
+#' @return Generates a ixj matrix filled with ones.
+#'
+#' @examples
+#' OneMat(2)
+#'
+#' @export
+#'
+
+OneMat = function(i,j=i) {
+  Y = matrix(data = c(rep(1, i*j)), nrow = i, ncol = j)
+  return(Y)
+}
+
+#' Moleculors Zeros Matrix
+#'
+#' Generates a ixj matrix filled with zeros
+#'
+#' @return Generates a ixj matrix filled with zero.
+#'
+#' @examples
+#' ZeroMat(2)
+#'
+#' @export
+#'
+
+ZeroMat = function(i,j=i){
+  Y = matrix(data = c(rep(0, i*j)), nrow = i, ncol = j)
+  return(Y)
+}
+
+
+#' Moleculors inverse matrix
+#'
+#' Compute the inverse matrix of the input A using the determinant and the adj matrix
+#' this function is not computing efficient due to the computation of the determinant
+#' is supposed to be used for small matrices
+#'
+#' @return Inverse matrix of the input matrix A
+#'
+#' @examples
+#' A = matrix(1,2,3,5)
+#' invMat(A)
+#'
+#' @export
+#'
+
+invMat = function(A) {
+  if (is.matrix(A) == FALSE) {
+    return("Pointed object is not a matrix")
+  } else if (det(A) == 0) {
+    return("Inversion can't be performed on a singular matrix")
+  }
+  INV = ZeroMat(nrow(A), ncol(A))
+
+  for (i1 in 1:nrow(A)) {
+    for (j1 in 1:ncol(A)) {
+      B = A[-i1,-j1]
+      if (is.matrix(B) == FALSE) {
+        INV[j1,i1] = (-1)^(i1+j1)*B
+      } else {
+        INV[j1,i1] = (-1)^(i1+j1)*det(B)
+      }
+    }
+  }
+  INV = (1/det(A))*INV
+  return(INV)
+}
+
+#' Moleculors inverse matrix with gauss jordan algorithm
+#'
+#' Compute the inverse matrix of the input A using the gauss jordan algorithm
+#'
+#' @return Inverse matrix of the input matrix A
+#'
+#' @examples
+#' A = matrix(1,2,3,5)
+#' invMat(A)
+#'
+#' @export
+#'
+#'
+
+gauss_jordan_inverse <- function(A){
+  if (is.matrix(A) == FALSE) {
+    return("Pointed object is not a matrix")
+  } else if (nrow(A) != ncol(A)) {
+    return("Pointed object is not a square matrix")
+  }
+  I = diag(nrow(A))
+
+  for (i in 1:nrow(A)) {
+    if (A[i,i] == 0) {
+      for (k in (i+1):nrow(A)) {
+        if (A[k,i] != 0) {
+          temp_row = A[k,]
+          A[k,] = A[i,]
+          A[i,] = temp_row
+          temp_row = I[k,]
+          I[k,] = I[i,]
+          I[i,] = temp_row
+          break
+        } else if (k == nrow(A)) {
+          return("Pointed object is not a non-singular matrix")
+        }
+      }
+    }
+    I[i,] = I[i,]/A[i,i]
+    A[i,] = A[i,]/A[i,i]
+
+
+    for (j in 1:nrow(A)) {
+      if (i != j & A[j,i] != 0) {
+        ratio = A[j,i]
+        for (h in 1:ncol(A)) {
+          A[j,h] = A[j,h] -ratio*A[i,h]
+          I[j,h] = I[j,h] -ratio*I[i,h]
+        }
+      }
+    }
+  }
+  return(I)
+}
