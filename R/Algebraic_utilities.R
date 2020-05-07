@@ -100,6 +100,9 @@ gauss_jordan_inverse <- function(A){
 
   for (i in 1:nrow(A)) {
     if (A[i,i] == 0) {
+      if (i == nrow(A)) {
+        return("Pointed object is not a non-singular matrix")
+      }
       for (k in (i+1):nrow(A)) {
         if (A[k,i] != 0) {
           temp_row = A[k,]
@@ -109,8 +112,6 @@ gauss_jordan_inverse <- function(A){
           I[k,] = I[i,]
           I[i,] = temp_row
           break
-        } else if (k == nrow(A)) {
-          return("Pointed object is not a non-singular matrix")
         }
       }
     }
@@ -130,3 +131,4 @@ gauss_jordan_inverse <- function(A){
   }
   return(I)
 }
+
