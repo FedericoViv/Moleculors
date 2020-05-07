@@ -77,6 +77,8 @@ invMat = function(A) {
 #' Moleculors inverse matrix with gauss jordan algorithm
 #'
 #' Compute the inverse matrix of the input A using the gauss jordan algorithm
+#' Given A*X-1 = I we solve with gauss algorithm the augmented matrix 'AI'
+#' by forward elimination and backward we can manage to obtain 'IX-1'
 #'
 #' @return Inverse matrix of the input matrix A
 #'
