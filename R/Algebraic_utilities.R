@@ -47,12 +47,12 @@ ZeroMat = function(i,j=i){
 #'
 #' @examples
 #' A = matrix(1,2,3,5)
-#' invMat(A)
+#' invMat_old_not_supported(A)
 #'
 #' @export
 #'
 
-invMat = function(A) {
+invMat_old_not_supported = function(A) {
   if (is.matrix(A) == FALSE) {
     return("Pointed object is not a matrix")
   } else if (det(A) == 0) {
@@ -90,7 +90,7 @@ invMat = function(A) {
 #'
 #'
 
-gauss_jordan_inverse <- function(A){
+invMat <- function(A){
   if (is.matrix(A) == FALSE) {
     return("Pointed object is not a matrix")
   } else if (nrow(A) != ncol(A)) {

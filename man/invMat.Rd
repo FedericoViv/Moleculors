@@ -2,7 +2,7 @@
 % Please edit documentation in R/Algebraic_utilities.R
 \name{invMat}
 \alias{invMat}
-\title{Moleculors inverse matrix}
+\title{Moleculors inverse matrix with gauss jordan algorithm}
 \usage{
 invMat(A)
 }
@@ -10,9 +10,9 @@ invMat(A)
 Inverse matrix of the input matrix A
 }
 \description{
-Compute the inverse matrix of the input A using the determinant and the adj matrix
-this function is not computing efficient due to the computation of the determinant
-is supposed to be used for small matrices
+Compute the inverse matrix of the input A using the gauss jordan algorithm
+Given A*X-1 = I we solve with gauss algorithm the augmented matrix 'AI'
+by forward elimination and backward we can manage to obtain 'IX-1'
 }
 \examples{
 A = matrix(1,2,3,5)
