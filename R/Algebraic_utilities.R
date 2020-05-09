@@ -99,12 +99,12 @@ invMat <- function(A){
   I = diag(nrow(A))
 
   for (i in 1:nrow(A)) {
-    if (A[i,i] == 0) {
+    if (A[i,i] != max(A[i:nrow(A),i])) {
       if (i == nrow(A)) {
         return("Pointed object is not a non-singular matrix")
       }
       for (k in (i+1):nrow(A)) {
-        if (A[k,i] != 0) {
+        if (A[k,i] == max(A[k:nrow(A),i])) {
           temp_row = A[k,]
           A[k,] = A[i,]
           A[i,] = temp_row
@@ -132,3 +132,36 @@ invMat <- function(A){
   return(I)
 }
 
+
+
+#' Moleculors Hilbert matrix
+#'
+#' Compute a nxn hilbert matrix. It can be used to check the quality of the
+#' solution algorithm in a quasi singular matrix. How to use: generate a nxn hilbert matrix
+#' compute the b coefficient directly by multiplying the hylbert matrix by a vector x with n random
+#' values. Solve the equation Hx=b with the preferred solution algorithm. The better xcalc is closed to
+#' the x generated, the better the algorightm.
+#'
+#' @return Hilbert matrix, randomized x and computed b
+#'
+#' @examples
+#' H = Hilb(10)
+#'
+#'
+#' @export
+#'
+#'
+
+Hilb <- function(n){
+  H <- ZeroMat(n)
+  for (i in 1:n) {
+    for (j in 1:n) {
+      H[i,j] = 1/(i+j-1)
+    }
+  }
+  x <- runif(n)
+  b <- H%*%x
+  output <- list(H,x,b)
+  names(output) <- c("H","x","b")
+  return(output)
+}
