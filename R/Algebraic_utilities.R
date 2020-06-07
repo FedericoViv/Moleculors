@@ -165,3 +165,44 @@ Hilb <- function(n){
   names(output) <- c("H","x","b")
   return(output)
 }
+
+#' Moleculors Orthonormal Matrix
+#'
+#' Compute the orthonormal matrix of the input matrix A supposed non singular
+#' and composed of linearly independent column. Gram-Schimdt algorithm
+#' is used to compute the QR factorization of the input matrix A. Where
+#' Q is the orthonormal matrix and R is a triangular matrix computed
+#' following Gram-Schimdt algorigthm. The orthonormal bassis are computed
+#' from the matrix column in the following way.
+#' A1 = r11u1
+#' A2 = r12u1 + r22u2
+#' A3 = r13u1 + r23u2 + r33u3
+#'
+#' where r11 is the dot product of the column 1 of the matrix A,
+#' r12 is computed as the dot product of u1 and A2 and rjj is computed
+#' as sqrt"Aj^2 - r1,j^2 ... r1,j-1,j^2"
+#' uj is then easily computed as uj = Aj - r1ju1 .... rj-1,juj-1/rjj
+#'
+#'
+#' @return The orthonormal basis set of the input matrix A
+#'
+#' @examples
+#' Obasis = Orthonormal(A)
+#'
+#'
+#' @export
+#'
+#'
+
+Orthonormal <- function(A){
+  R = A
+  for (i in 1:nrow(A)) {
+    Rii = A[i,]%*%A[,i]
+    A[,i] = A[,i]/as.numeric(sqrt(Rii))
+    for (j in i:ncol(A)) {
+      A[,j] = A[,j] - A[,i]
+    }
+  }
+
+  return(A)
+}

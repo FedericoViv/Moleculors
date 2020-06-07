@@ -62,3 +62,48 @@ descriptor_launcher = function(){
 
 }
 
+
+#' Moleculors multiple graph and descriptor calculator.
+#'
+#' This function loop through the multiple input selected and calculate
+#' the graphical matrices and descriptor for each molecule. Results are stored
+#' in the descriptor matrix where each column is a molecule and each row are the
+#' orded descriptors
+#'
+#'
+#'
+#' @examples
+#' moleculors_multiple_descriptor()
+#'
+#'
+#' @export
+
+
+moleculors_multiple_descriptor <- function() {
+
+  if (length(Mol_mat$input_list) > 0 ) {
+
+    descriptor_matrix = matrix(ncol = length(Mol_mat$input_list), nrow = 35)
+
+
+    for (i in 1:length(Mol_mat$input_list)) {
+
+      Mol_mat$input <- Mol_mat$input_list[[i]]
+
+      molecular_weight()
+
+      N_atoms()
+
+      graphical_matrix()
+
+      descriptor_launcher()
+
+      descriptor_matrix[,i] <- t(as.matrix(Data_summary))
+
+    }
+
+    assign("descriptor_matrix", descriptor_matrix, envir = globalenv())
+
+  }
+}
+

@@ -51,6 +51,25 @@ Moleculors_GUI = function(){
     text      = "Use comma for decimal place",
     checked   = decimal_place(),
   )
+  #multiple loading
+  body[2,1] = gbutton(
+    "Upload molecular set",
+    handler = function(h, ...){
+      text_show_load = capture.output(molecular_input_multiple(), type = "message")
+    }
+  )
+  #multiple analysis
+  body[2,40] = gbutton(
+    "molecular set descriptor calculation",
+    handler = function(h, ...){
+      text_show_desc = capture.output(moleculors_multiple_descriptor(), type = "message")
+      picker_list = names(Output_descp)
+      body[3,40] = gcombobox(picker_list,
+                             handler = function(h, ...){
+                               body[3:20,40] = gtable(get(svalue(h$obj), envir = Output_descp))
+                             })
+    }
+  )
 
   calc_matrix()
   vis_descriptor()
@@ -92,7 +111,7 @@ vis_descriptor = function() {
       text_show_desc = capture.output(descriptor_launcher(), type = "message")
       tail[2,60] = glabel(text_show_desc)
       picker_list = names(Output_descp)
-      body[2,40] = gcombobox(picker_list,
+      body[3,40] = gcombobox(picker_list,
                                handler = function(h, ...){
                                  body[3:20,40] = gtable(get(svalue(h$obj), envir = Output_descp))
                                })
@@ -108,10 +127,16 @@ file_dump = function(){
   tail[1,1] = gbutton(
     "Download output file",
     handler = function(h, ...){
-      write.csv(Data_summary, file = as.character(svalue(tail[2,1])))
+      write.csv(Data_summary, file = paste(as.character(svalue(tail[2,1])), ".csv"))
     }
   )
   tail[2,1] = gedit()
+  tail[3,1] = gbutton(
+    "Download output matrix",
+    handler = function(h, ...){
+      write.csv(descriptor_matrix, file = paste(as.character(svalue(tail[4,1])), ".csv"))
+    }
+  )
+  tail[4,1] = gedit()
 }
-
 
