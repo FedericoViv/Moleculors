@@ -90,10 +90,6 @@ moleculors_multiple_descriptor <- function() {
 
       Mol_mat$input <- Mol_mat$input_list[[i]]
 
-      molecular_weight()
-
-      N_atoms()
-
       graphical_matrix()
 
       descriptor_launcher()
@@ -101,6 +97,7 @@ moleculors_multiple_descriptor <- function() {
       descriptor_matrix[,i] <- t(as.matrix(Data_summary))
 
     }
+    rownames(descriptor_matrix) <- names(Output_descp)
 
     assign("descriptor_matrix", descriptor_matrix, envir = globalenv())
 
