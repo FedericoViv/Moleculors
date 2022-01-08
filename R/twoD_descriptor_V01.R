@@ -494,11 +494,13 @@ Bulk_Electronegativity_indexes_calc <- function() {
         adding_hydrogen <- adding_hydrogen + 4 - Mol_mat$graph_Vlaplacian_full_matrix[h,h]
       }
     }
-
-    for (l in 1:adding_hydrogen) {
-      saturated_skeleton[nrow(saturated_skeleton) +1,] = c("H", 0, 0, 0)
+    
+    if (adding_hydrogen > 0){
+      for (l in 1:adding_hydrogen) {
+        saturated_skeleton[nrow(saturated_skeleton) +1,] = c("H", 0, 0, 0)
+      }
     }
-
+    
     for (j in 1:nrow(Mol_mat$input)) {
       Ztot_full[j] <- valence_electrons$Total_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input$Atom[[j]]))]
       Zval_full[j] <- valence_electrons$valence_electrons[which(valence_electrons$Symbol == as.character(Mol_mat$input$Atom[[j]]))]
