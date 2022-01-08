@@ -546,7 +546,7 @@ Bulk_Electronegativity_indexes_calc <- function() {
     dalphaB <- (total_bulkR - total_bulk)/nrow(Mol_mat$input_H_suppressed)
 
     epsilon2 <- sum(epsilon)/nrow(Mol_mat$input_H_suppressed)
-    epsilon3 <- sum(epsilonR)/nrow(Mol_mat$input_H_suppressed)
+    epsilon3 <- (sum(epsilonR) + 0.3*(nrow(saturated_skeleton) - nrow(reference_alcane)))/nrow(saturated_skeleton)
     epsilon1 <- sum(epsilon_full)/nrow(Mol_mat$input)
     epsilon4 <- sum(epsilon_sat)/nrow(saturated_skeleton)
     epsilon5 <- (sum(epsilon) + hydrogen_to_heteroatom*(0.3))/(nrow(Mol_mat$input_H_suppressed) + hydrogen_to_heteroatom)
