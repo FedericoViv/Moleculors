@@ -13,4 +13,5 @@ This repository contains a set of function for the calculation of molecular desc
 The following material can be consulted for additional information regarding graphical matrices and molecular descriptors:
 - Janežič, D., 2015. Graph-Theoretical Matrices in Chemistry. CRC Press. https://doi.org/10.1201/b18389
 - Todeschini, R., Consonni, V., 2000. Handbook of Molecular Descriptors, 1st ed, Methods and Principles in Medicinal Chemistry. Wiley. https://doi.org/10.1002/9783527613106
-
+- Roy, K., and R. N. Das. "On some novel extended topochemical atom (ETA) parameters for effective encoding of chemical information and modelling of fundamental physicochemical properties." SAR and QSAR in Environmental Research 22.5-6 (2011): 451-472. https://doi.org/10.1080/1062936X.2011.569900
+- Understanding the Basics of QSAR for Applications in Pharmaceutical Sciences and Risk Assessment. Roy, K., and R. N. Das. Academic Press <u>ISBN:978-0-12-801633-6<u>
